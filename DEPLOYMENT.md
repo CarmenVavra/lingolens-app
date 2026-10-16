@@ -84,6 +84,7 @@ Im Ordner `lingolens`: `.env.production.example` kopieren → umbenennen in **`.
 
 - `APP_KEY=` den Schlüssel aus Schritt 2 eintragen (inkl. `base64:`)
 - `GOOGLE_VISION_API_KEY=` und `OPENAI_API_KEY=` eintragen
+- **`LEGAL_NAME`, `LEGAL_STREET`, `LEGAL_CITY`, `LEGAL_EMAIL`** ausfüllen – erscheinen in Impressum und Datenschutzerklärung (solange sie fehlen, zeigen die Seiten rote Hinweise)
 - optional `LINGOLENS_REGISTRATION_CODE=` setzen, damit sich nur deine Klasse registrieren kann
 - `LINGOLENS_DAILY_SCAN_LIMIT=` (Standard 20 Texte pro Schüler und Tag)
 
@@ -118,9 +119,18 @@ Fehler stehen in `lingolens/storage/logs/laravel-JJJJ-MM-TT.log`.
 
 ---
 
-## 5. Vor dem Go-live noch zu klären
+## 5. Impressum & Datenschutz
 
-- **Impressum** (Pflicht in Österreich, § 5 ECG / § 25 MedienG).
-- **Datenschutzerklärung (DSGVO):** Schülertexte gehen an Google (OCR) und OpenAI (Korrektur) – Auftragsverarbeitung, Datenübermittlung in die USA, Speicherdauer, Betroffenenrechte. Schüler:innen sind teils minderjährig; in Österreich ist die Einwilligung ab 14 Jahren möglich. Bitte rechtlich prüfen lassen.
+- **/impressum** und **/datenschutz** sind eingebaut und auf jeder Seite unten verlinkt (auch auf Login und Registrierung).
+- Die Betreiberdaten kommen aus der `.env` (`LEGAL_*`), damit sie nicht im GitHub-Repo stehen.
+- Bei der Registrierung muss die Datenschutzerklärung bestätigt werden (inkl. Mindestalter 14); der Zeitpunkt wird gespeichert.
+- Keine Drittanbieter beim Seitenaufruf: Die Schrift wird lokal ausgeliefert, kein Tracking, nur technisch notwendige Cookies.
+- Google Vision läuft über den **EU-Endpunkt** (`eu-vision.googleapis.com`) – Fotos werden nur in der EU verarbeitet.
+- Die Texte sind eine sorgfältige Vorlage, aber **keine Rechtsberatung**. Bitte vor dem Go-live prüfen lassen, insbesondere: Vertragspartner bei Google Cloud und OpenAI (laut deren Auftragsverarbeitungsverträgen), Speicherdauer und ob ein gewerblicher Betrieb vorliegt.
+- Mit Google Cloud und OpenAI die jeweiligen **Auftragsverarbeitungsverträge (DPA)** in deren Konsolen akzeptieren.
+
+## 6. Vor dem Go-live sonst noch offen
+
 - **Passwort vergessen:** noch nicht eingebaut – braucht ein E-Mail-Postfach (SMTP bei netcup).
+- **Konto selbst löschen:** derzeit per E-Mail-Anfrage (so in der Datenschutzerklärung beschrieben).
 - **Keine Demo-Daten** auf dem Server (`db:seed` nicht ausführen).

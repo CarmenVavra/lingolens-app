@@ -30,6 +30,8 @@ return [
 
     'google' => [
         'vision_key' => env('GOOGLE_VISION_API_KEY'),
+        // EU endpoint: Google stores and processes OCR data only in the European Union.
+        'vision_endpoint' => env('GOOGLE_VISION_ENDPOINT', 'https://eu-vision.googleapis.com'),
     ],
 
     'openai' => [

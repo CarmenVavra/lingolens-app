@@ -37,6 +37,7 @@ class RegisterRequest extends FormRequest
             'department' => ['nullable', 'required_if:school_type,BHS', Rule::in(config('lingolens.departments'))],
             'class_name' => ['nullable', 'string', 'max:20'],
             'grade' => ['nullable', 'integer', 'between:1,8'],
+            'privacy' => ['accepted'],
         ];
     }
 
@@ -55,6 +56,17 @@ class RegisterRequest extends FormRequest
             'class_name' => 'Klasse',
             'grade' => 'Schulstufe',
             'access_code' => 'Zugangscode',
+            'privacy' => 'Datenschutzerklärung',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'privacy.accepted' => 'Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.',
         ];
     }
 
@@ -65,7 +77,8 @@ class RegisterRequest extends FormRequest
      */
     public function profile(): array
     {
-        $data = $this->safe()->except(['password_confirmation', 'access_code']);
+        $data = $this->safe()->except(['password_confirmation', 'access_code', 'privacy']);
+        $data['privacy_accepted_at'] = now();
 
         if ($data['school_type'] === SchoolType::AHS->value) {
             $data['school_form'] = 'AHS';

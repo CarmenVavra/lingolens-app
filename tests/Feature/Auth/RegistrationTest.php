@@ -26,6 +26,7 @@ class RegistrationTest extends TestCase
             'email' => 'lena@example.com',
             'password' => 'geheim-passwort',
             'password_confirmation' => 'geheim-passwort',
+            'privacy' => '1',
             'school_type' => 'BHS',
             'school_form' => 'HTL',
             'department' => 'Chemieingenieurwesen',
@@ -48,6 +49,7 @@ class RegistrationTest extends TestCase
             'email' => 'max@example.com',
             'password' => 'geheim-passwort',
             'password_confirmation' => 'geheim-passwort',
+            'privacy' => '1',
             'school_type' => 'AHS',
             'department' => 'Chemieingenieurwesen',
         ])->assertRedirect(route('dashboard'));
@@ -64,6 +66,7 @@ class RegistrationTest extends TestCase
             'email' => 'lena@example.com',
             'password' => 'geheim-passwort',
             'password_confirmation' => 'geheim-passwort',
+            'privacy' => '1',
             'school_type' => 'BHS',
             'school_form' => 'HTL',
             'department' => 'Zauberei',

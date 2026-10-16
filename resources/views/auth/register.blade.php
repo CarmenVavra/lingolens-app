@@ -121,6 +121,20 @@
             </div>
         </div>
 
+        <div class="field">
+            <label class="checkbox checkbox--top">
+                <input type="checkbox" name="privacy" value="1" required @checked(old('privacy'))
+                    @error('privacy') aria-invalid="true" aria-describedby="privacy-error" @enderror>
+                <span>
+                    Ich habe die <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener">Datenschutzerklärung</a>
+                    gelesen und bin mindestens {{ config('legal.minimum_age') }} Jahre alt – oder meine Erziehungsberechtigten sind einverstanden.
+                </span>
+            </label>
+            @error('privacy')
+                <span id="privacy-error" class="field-error">{{ $message }}</span>
+            @enderror
+        </div>
+
         <button type="submit" class="btn btn-primary btn-block">
             <span class="btn-label">Konto erstellen</span>
             <x-icon name="arrow-right" />

@@ -68,6 +68,10 @@
         {{ $slot }}
     </main>
 
+    <footer class="app-footer">
+        <x-legal-links />
+    </footer>
+
     <nav class="app-tabbar only-mobile" aria-label="Hauptnavigation">
         <a href="{{ route('dashboard') }}" class="app-tabbar__item" @if ($active === 'dashboard') aria-current="page" @endif>
             <x-icon name="house" :size="22" />Start

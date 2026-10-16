@@ -7,6 +7,7 @@
 */
 
 return [
+    'accepted' => ':Attribute muss bestätigt werden.',
     'between' => [
         'numeric' => ':Attribute muss zwischen :min und :max liegen.',
         'string' => ':Attribute muss zwischen :min und :max Zeichen lang sein.',

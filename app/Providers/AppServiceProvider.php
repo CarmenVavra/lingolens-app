@@ -23,7 +23,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // OCR is only called outside demo mode (the job uses sample texts there).
         $this->app->bind(TextRecognizer::class, fn () => new GoogleVisionTextRecognizer(
-            (string) config('services.google.vision_key')
+            (string) config('services.google.vision_key'),
+            (string) config('services.google.vision_endpoint'),
         ));
 
         // Real AI correction when keys are configured, sample feedback in demo mode.

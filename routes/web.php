@@ -4,10 +4,15 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CorrectionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\ScanController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
+
+// Public legal pages (reachable with and without login)
+Route::get('/impressum', [LegalController::class, 'imprint'])->name('legal.imprint');
+Route::get('/datenschutz', [LegalController::class, 'privacy'])->name('legal.privacy');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');

@@ -66,6 +66,7 @@ class ProductionSafeguardsTest extends TestCase
             'email' => 'lena@example.com',
             'password' => 'geheim-passwort',
             'password_confirmation' => 'geheim-passwort',
+            'privacy' => '1',
             'school_type' => 'AHS',
         ];
 

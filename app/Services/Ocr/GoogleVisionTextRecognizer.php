@@ -11,16 +11,22 @@ use Illuminate\Support\Facades\Http;
  */
 class GoogleVisionTextRecognizer implements TextRecognizer
 {
-    private const IMAGE_ENDPOINT = 'https://vision.googleapis.com/v1/images:annotate';
+    private const IMAGE_PATH = '/v1/images:annotate';
 
     /** Synchronous file annotation; Vision reads the first five pages of a PDF. */
-    private const FILE_ENDPOINT = 'https://vision.googleapis.com/v1/files:annotate';
+    private const FILE_PATH = '/v1/files:annotate';
 
-    public function __construct(private readonly string $apiKey) {}
+    /**
+     * @param  string  $endpoint  e.g. https://eu-vision.googleapis.com (data stays in the EU)
+     */
+    public function __construct(
+        private readonly string $apiKey,
+        private readonly string $endpoint = 'https://eu-vision.googleapis.com',
+    ) {}
 
     public function recognizeImage(Scan $scan, string $imageContents): string
     {
-        $response = $this->post(self::IMAGE_ENDPOINT, [
+        $response = $this->post(self::IMAGE_PATH, [
             'image' => ['content' => base64_encode($imageContents)],
             'features' => [['type' => 'DOCUMENT_TEXT_DETECTION']],
             'imageContext' => ['languageHints' => ['en']],
@@ -31,7 +37,7 @@ class GoogleVisionTextRecognizer implements TextRecognizer
 
     public function recognizePdf(Scan $scan, string $pdfContents): string
     {
-        $response = $this->post(self::FILE_ENDPOINT, [
+        $response = $this->post(self::FILE_PATH, [
             'inputConfig' => ['content' => base64_encode($pdfContents), 'mimeType' => 'application/pdf'],
             'features' => [['type' => 'DOCUMENT_TEXT_DETECTION']],
             'imageContext' => ['languageHints' => ['en']],
@@ -46,12 +52,12 @@ class GoogleVisionTextRecognizer implements TextRecognizer
     /**
      * @param  array<string, mixed>  $request
      */
-    private function post(string $endpoint, array $request): Response
+    private function post(string $path, array $request): Response
     {
         return Http::timeout(90)
             ->retry(2, 500, throw: false)
             ->withQueryParameters(['key' => $this->apiKey])
-            ->post($endpoint, ['requests' => [$request]])
+            ->post(rtrim($this->endpoint, '/').$path, ['requests' => [$request]])
             ->throw();
     }
 }

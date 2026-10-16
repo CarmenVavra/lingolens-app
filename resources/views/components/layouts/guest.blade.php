@@ -24,6 +24,7 @@
         <main class="auth-page__form" id="main">
             <div class="auth-card">
                 {{ $slot }}
+                <x-legal-links />
             </div>
         </main>
     </div>

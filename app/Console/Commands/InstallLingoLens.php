@@ -41,6 +41,12 @@ class InstallLingoLens extends Command
 
         $this->call('migrate', ['--force' => true]);
 
+        foreach (['name' => 'LEGAL_NAME', 'street' => 'LEGAL_STREET', 'city' => 'LEGAL_CITY', 'email' => 'LEGAL_EMAIL'] as $key => $env) {
+            if (blank(config('legal.operator.'.$key))) {
+                $this->warn("{$env} fehlt in der .env – Impressum und Datenschutzerklärung sind unvollständig.");
+            }
+        }
+
         $this->info('LingoLens AI ist bereit.');
 
         return self::SUCCESS;

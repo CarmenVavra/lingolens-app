@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -19,6 +20,7 @@ use Illuminate\Support\Str;
  * @property string|null $department
  * @property string|null $class_name
  * @property int|null $grade
+ * @property Carbon|null $privacy_accepted_at
  */
 class User extends Authenticatable
 {
@@ -39,6 +41,7 @@ class User extends Authenticatable
         'department',
         'class_name',
         'grade',
+        'privacy_accepted_at',
     ];
 
     /**
@@ -70,6 +73,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'school_type' => SchoolType::class,
             'grade' => 'integer',
+            'privacy_accepted_at' => 'datetime',
         ];
     }
 
