@@ -30,13 +30,13 @@ class AnnotatedText
 
         foreach ($wrongTexts as $needle) {
             $needle = trim($needle);
-            $length = mb_strlen($needle);
             $found = null;
 
-            if ($length > 0) {
+            if ($needle !== '') {
                 foreach ([$cursor, 0] as $from) {
                     $found = self::findFree($text, $needle, $from, $taken, false)
-                        ?? self::findFree($text, $needle, $from, $taken, true);
+                        ?? self::findFree($text, $needle, $from, $taken, true)
+                        ?? self::findFreeAcrossLines($text, $needle, $from, $taken);
 
                     if ($found !== null) {
                         break;
@@ -50,9 +50,9 @@ class AnnotatedText
                 continue;
             }
 
-            $taken[] = [$found, $found + $length];
-            $cursor = $found + $length;
-            $result[] = [$found, $found + $length];
+            $taken[] = $found;
+            $cursor = $found[1];
+            $result[] = $found;
         }
 
         return $result;
@@ -74,6 +74,8 @@ class AnnotatedText
 
         foreach ($segments as $segment) {
             if ($segment['correction'] !== null) {
+                // A marked passage may span a handwriting line break.
+                $segment['text'] = (string) preg_replace('/[ \t]*\n[ \t]*/', ' ', $segment['text']);
                 $current[] = $segment;
 
                 continue;
@@ -187,8 +189,9 @@ class AnnotatedText
 
     /**
      * @param  list<array{0: int, 1: int}>  $taken
+     * @return array{0: int, 1: int}|null
      */
-    private static function findFree(string $haystack, string $needle, int $from, array $taken, bool $caseInsensitive): ?int
+    private static function findFree(string $haystack, string $needle, int $from, array $taken, bool $caseInsensitive): ?array
     {
         $length = mb_strlen($needle);
         $offset = $from;
@@ -202,15 +205,53 @@ class AnnotatedText
                 return null;
             }
 
-            $overlaps = collect($taken)->contains(
-                fn (array $range) => $position < $range[1] && $position + $length > $range[0]
-            );
-
-            if (! $overlaps) {
-                return $position;
+            if (! self::overlaps($position, $position + $length, $taken)) {
+                return [$position, $position + $length];
             }
 
             $offset = $position + 1;
         }
+    }
+
+    /**
+     * Fallback for passages the OCR split over two lines (handwriting line
+     * breaks) or that the AI quotes with different spacing: any whitespace in
+     * the passage may be spaces or a single line break, never a blank line.
+     *
+     * @param  list<array{0: int, 1: int}>  $taken
+     * @return array{0: int, 1: int}|null
+     */
+    private static function findFreeAcrossLines(string $haystack, string $needle, int $from, array $taken): ?array
+    {
+        $words = preg_split('/\s+/u', $needle, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        if (count($words) < 2) {
+            return null;
+        }
+
+        $pattern = '/'.implode('(?:[ \t]*\r?\n[ \t]*|[ \t]+)', array_map(fn (string $word) => preg_quote($word, '/'), $words)).'/iu';
+        $byteOffset = strlen(mb_substr($haystack, 0, $from));
+
+        while (preg_match($pattern, $haystack, $match, PREG_OFFSET_CAPTURE, $byteOffset) === 1) {
+            [$matched, $bytePosition] = $match[0];
+            $start = mb_strlen(substr($haystack, 0, $bytePosition));
+            $end = $start + mb_strlen($matched);
+
+            if (! self::overlaps($start, $end, $taken)) {
+                return [$start, $end];
+            }
+
+            $byteOffset = $bytePosition + strlen(mb_substr($matched, 0, 1));
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  list<array{0: int, 1: int}>  $taken
+     */
+    private static function overlaps(int $start, int $end, array $taken): bool
+    {
+        return collect($taken)->contains(fn (array $range) => $start < $range[1] && $end > $range[0]);
     }
 }

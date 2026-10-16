@@ -26,6 +26,35 @@ class AnnotatedTextTest extends TestCase
         $this->assertSame([[6, 11]], AnnotatedText::locate('Größe stuff', ['stuff']));
     }
 
+    public function test_it_finds_passages_across_handwriting_line_breaks(): void
+    {
+        $text = "students must learn how to use\ntechnology responsible. Größe   matters";
+
+        $this->assertSame(
+            [[27, 53], [55, 70]],
+            AnnotatedText::locate($text, ['use technology responsible', 'Größe matters'])
+        );
+    }
+
+    public function test_line_break_matching_never_spans_paragraphs(): void
+    {
+        $this->assertSame([null], AnnotatedText::locate("the end\n\nof story", ['end of']));
+    }
+
+    public function test_marks_across_line_breaks_are_rendered_on_one_line(): void
+    {
+        $text = "how to use\ntechnology responsible. Done.";
+        $correction = new Correction(['wrong_text' => 'use technology responsible', 'error_type' => ErrorType::Grammar]);
+        $correction->id = 3;
+        [[$correction->start_offset, $correction->end_offset]] = AnnotatedText::locate($text, ['use technology responsible']);
+
+        $segments = AnnotatedText::paragraphs($text, collect([$correction]))[0]['segments'];
+
+        $this->assertSame('how to ', $segments[0]['text']);
+        $this->assertSame('use technology responsible', $segments[1]['text']);
+        $this->assertSame('. Done.', $segments[2]['text']);
+    }
+
     public function test_it_builds_headings_paragraphs_and_marks(): void
     {
         $text = "1  Method\n\nWe heated it since 20 minutes.\nThen we stopped.";
