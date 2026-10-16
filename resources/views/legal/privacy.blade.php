@@ -45,9 +45,11 @@
         <h2>2. Welche Daten wir verarbeiten</h2>
         <h3>Konto</h3>
         <p>
-            Name, E-Mail-Adresse, Passwort (nur als sicherer Hash gespeichert, nie im Klartext), dein Schulprofil
-            (Schultyp, Schulform, Fachrichtung, Klasse, Schulstufe) sowie der Zeitpunkt, zu dem du diese
-            Datenschutzerklärung bestätigt hast.
+            Dein Konto wird von der Administration angelegt, eine Selbstregistrierung gibt es nicht. Gespeichert werden
+            Name, E-Mail-Adresse und dein Schulprofil (Schultyp, Schulform, Fachrichtung, Klasse, Schulstufe). Dein
+            Passwort legst du über den Link in der Einladungs-E-Mail selbst fest; es wird nur als sicherer Hash
+            gespeichert, nie im Klartext. Außerdem speichern wir den Zeitpunkt, zu dem du diese Datenschutzerklärung
+            bestätigt hast.
         </p>
         <h3>Deine Texte</h3>
         <p>
@@ -72,8 +74,9 @@
         <dl class="legal__facts legal__facts--wide">
             <dt>Bereitstellung der Lernplattform</dt>
             <dd>
-                Konto, Texterkennung, KI-Korrektur, Verlauf und Statistiken sowie – nur auf deine Anfrage – eine E-Mail mit
-                einem Link zum Zurücksetzen des Passworts; zur Erfüllung des Nutzungsverhältnisses (Art. 6 Abs. 1 lit. b DSGVO).
+                Konto, Texterkennung, KI-Korrektur, Verlauf und Statistiken, die Einladungs-E-Mail zum Festlegen deines
+                Passworts sowie – nur auf deine Anfrage – eine E-Mail mit einem Link zum Zurücksetzen des Passworts; zur
+                Erfüllung des Nutzungsverhältnisses (Art. 6 Abs. 1 lit. b DSGVO).
             </dd>
             <dt>Sicherheit und Missbrauchsschutz</dt>
             <dd>
@@ -132,6 +135,7 @@
             <li><strong>Erkannter Text, Korrekturen und Statistiken:</strong> solange dein Konto besteht, damit du deinen Verlauf und Fortschritt sehen kannst.</li>
             <li><strong>Konto:</strong> bis du die Löschung verlangst. Mit dem Konto werden alle deine Texte und Korrekturen gelöscht.</li>
             <li><strong>Protokolldateien:</strong> höchstens {{ $logDays }} Tage.</li>
+            <li><strong>Einladungslinks:</strong> sind {{ $invitationDays }} Tage gültig und werden danach ungültig.</li>
             <li><strong>Links zum Zurücksetzen des Passworts:</strong> sind 60 Minuten gültig und werden danach ungültig.</li>
             <li><strong>Sitzungsdaten:</strong> verfallen nach {{ $sessionHours }} Stunden Inaktivität bzw. beim Abmelden.</li>
         </ul>

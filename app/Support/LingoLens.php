@@ -22,6 +22,14 @@ class LingoLens
         return blank(config('services.google.vision_key')) || blank(config('services.openai.key'));
     }
 
+    /**
+     * Validity of the invitation link in days (rounded up).
+     */
+    public static function invitationDays(): int
+    {
+        return max(1, (int) ceil((int) config('auth.passwords.invitations.expire') / 1440));
+    }
+
     public static function daysUntilMatura(): int
     {
         $date = now()->parse((string) config('lingolens.matura_date'))->startOfDay();

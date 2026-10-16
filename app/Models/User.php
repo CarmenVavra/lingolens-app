@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
  * @property int $id
  * @property string $name
  * @property string $email
+ * @property bool $is_admin
  * @property SchoolType $school_type
  * @property string|null $school_form
  * @property string|null $department
@@ -50,6 +51,7 @@ class User extends Authenticatable
      */
     protected $attributes = [
         'school_type' => 'BHS',
+        'is_admin' => false,
     ];
 
     /**
@@ -75,6 +77,7 @@ class User extends Authenticatable
             'school_type' => SchoolType::class,
             'grade' => 'integer',
             'privacy_accepted_at' => 'datetime',
+            'is_admin' => 'boolean',
         ];
     }
 
@@ -94,6 +97,19 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
+    }
+
+    /**
+     * Invited students have not set their own password yet.
+     */
+    public function hasAcceptedInvitation(): bool
+    {
+        return $this->privacy_accepted_at !== null;
     }
 
     public function firstName(): string
@@ -128,6 +144,10 @@ class User extends Authenticatable
      */
     public function chipLabel(): string
     {
+        if ($this->isAdmin()) {
+            return 'Administration';
+        }
+
         return collect([$this->class_name, $this->school_form ?? $this->school_type->value])
             ->filter()
             ->implode(' · ');

@@ -85,8 +85,8 @@ Im Ordner `lingolens`: `.env.production.example` kopieren → umbenennen in **`.
 - `APP_KEY=` den Schlüssel aus Schritt 2 eintragen (inkl. `base64:`)
 - `GOOGLE_VISION_API_KEY=` und `OPENAI_API_KEY=` eintragen
 - **`LEGAL_NAME`, `LEGAL_STREET`, `LEGAL_CITY`, `LEGAL_EMAIL`** ausfüllen – erscheinen in Impressum und Datenschutzerklärung (solange sie fehlen, zeigen die Seiten rote Hinweise)
-- **E-Mail für „Passwort vergessen“:** `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD` und `MAIL_FROM_ADDRESS` eintragen. Benutzername und Absender müssen dasselbe **bestehende Postfach** sein (z. B. `admin@caryssa.at`), sonst lehnt netcup den Versand ab. Port 465 mit `MAIL_SCHEME=smtps`; Port 2525 funktioniert bei netcup nicht. Wer `noreply@caryssa.at` als Absender möchte, legt dafür in Plesk ein eigenes Postfach an.
-- optional `LINGOLENS_REGISTRATION_CODE=` setzen, damit sich nur deine Klasse registrieren kann
+- **E-Mail für Einladungen und „Passwort vergessen“:** `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD` und `MAIL_FROM_ADDRESS` eintragen. Benutzername und Absender müssen dasselbe **bestehende Postfach** sein (z. B. `admin@caryssa.at`), sonst lehnt netcup den Versand ab. Port 465 mit `MAIL_SCHEME=smtps`; Port 2525 funktioniert bei netcup nicht. Wer `noreply@caryssa.at` als Absender möchte, legt dafür in Plesk ein eigenes Postfach an.
+- **`LINGOLENS_ADMIN_EMAIL=admin@caryssa.at`** – das Admin-Konto. Eine Selbstregistrierung gibt es nicht; nur der Admin legt Schüler:innen an.
 - `LINGOLENS_DAILY_SCAN_LIMIT=` (Standard 20 Texte pro Schüler und Tag)
 
 ### 3.5 Geplante Aufgaben (Cron)
@@ -98,16 +98,19 @@ Im Ordner `lingolens`: `.env.production.example` kopieren → umbenennen in **`.
 | Einrichtung (einmalig, nach jedem Update) | `lingolens/artisan` | `lingolens:install` | Zeitplan egal, dann **„Jetzt ausführen“** |
 | Warteschlange & Aufräumen | `lingolens/artisan` | `schedule:run` | **Jede Minute** (Cron-Ausdruck `* * * * *`) |
 
-`lingolens:install` legt die SQLite-Datenbank an und führt die Migrationen aus. Die Ausgabe zeigt Plesk nach „Jetzt ausführen“ an.
+`lingolens:install` legt die SQLite-Datenbank an, führt die Migrationen aus und legt das Admin-Konto aus `LINGOLENS_ADMIN_EMAIL` an. Die Ausgabe zeigt Plesk nach „Jetzt ausführen“ an.
+
+**Admin-Passwort festlegen:** Das Admin-Konto bekommt zunächst ein zufälliges Passwort, das niemand kennt – so steht dein Passwort nirgends in einer Datei. Auf der Login-Seite **„Passwort vergessen?“** → `admin@caryssa.at` eingeben → Link aus der E-Mail öffnen → eigenes Passwort festlegen.
 
 > Mit SSH-Zugang (je nach netcup-Tarif) geht es auch direkt: `php artisan lingolens:install`
 
 ### 3.6 Testen
 
-1. https://lingolens.caryssa.at öffnen → registrieren.
-2. „Neuer Scan“ → **Beispieltext verwenden** → Analyse muss in unter einer Minute fertig sein.
-3. Ein echtes PDF und ein Foto hochladen.
-4. Abmelden → „Passwort vergessen?“ → kommt die E-Mail an? Unter „Mein Konto“ das Passwort ändern.
+1. https://lingolens.caryssa.at öffnen → Admin-Passwort wie oben festlegen und anmelden.
+2. **Schüler:innen** → „Schüler:in anlegen“ (z. B. mit einer zweiten eigenen Adresse) → Einladungs-E-Mail öffnen → Passwort festlegen.
+3. „Neuer Scan“ → **Beispieltext verwenden** → Analyse muss in unter einer Minute fertig sein.
+4. Ein echtes PDF und ein Foto hochladen.
+5. Abmelden → „Passwort vergessen?“ → kommt die E-Mail an? Unter „Mein Konto“ das Passwort ändern.
 
 Fehler stehen in `lingolens/storage/logs/laravel-JJJJ-MM-TT.log`.
 
@@ -123,9 +126,10 @@ Fehler stehen in `lingolens/storage/logs/laravel-JJJJ-MM-TT.log`.
 
 ## 5. Impressum & Datenschutz
 
-- **/impressum** und **/datenschutz** sind eingebaut und auf jeder Seite unten verlinkt (auch auf Login und Registrierung).
+- **/impressum** und **/datenschutz** sind eingebaut und auf jeder Seite unten verlinkt (auch auf Login und Einladungsseite).
 - Die Betreiberdaten kommen aus der `.env` (`LEGAL_*`), damit sie nicht im GitHub-Repo stehen.
-- Bei der Registrierung muss die Datenschutzerklärung bestätigt werden (inkl. Mindestalter 14); der Zeitpunkt wird gespeichert.
+- Beim Annehmen der Einladung muss die Datenschutzerklärung bestätigt werden (inkl. Mindestalter 14); der Zeitpunkt wird gespeichert.
+- Löschen auf Anfrage (Art. 17 DSGVO): **Schüler:innen** → „Löschen“ entfernt das Konto mit allen Texten und Korrekturen.
 - Keine Drittanbieter beim Seitenaufruf: Die Schrift wird lokal ausgeliefert, kein Tracking, nur technisch notwendige Cookies.
 - Google Vision läuft über den **EU-Endpunkt** (`eu-vision.googleapis.com`) – Fotos werden nur in der EU verarbeitet.
 - Die Texte sind eine sorgfältige Vorlage, aber **keine Rechtsberatung**. Bitte vor dem Go-live prüfen lassen, insbesondere: Vertragspartner bei Google Cloud und OpenAI (laut deren Auftragsverarbeitungsverträgen), Speicherdauer und ob ein gewerblicher Betrieb vorliegt.

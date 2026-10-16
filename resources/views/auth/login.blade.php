@@ -43,5 +43,7 @@
         </button>
     </form>
 
-    <p style="font-size:15px">Noch kein Konto? <a href="{{ route('register') }}">Jetzt registrieren</a></p>
+    <p style="font-size:15px">
+        Noch kein Konto? Konten werden von der Administration angelegt – du bekommst dann eine Einladung per E-Mail.
+    </p>
 </x-layouts.guest>

@@ -93,7 +93,7 @@ class LegalPagesTest extends TestCase
         $privacy = route('legal.privacy');
 
         $this->get(route('login'))->assertSee($imprint, false)->assertSee($privacy, false);
-        $this->get(route('register'))->assertSee($imprint, false)->assertSee($privacy, false);
+        $this->get(route('invitation.show', ['token' => 'abc']))->assertSee($imprint, false)->assertSee($privacy, false);
         $this->actingAs(User::factory()->create())
             ->get(route('dashboard'))->assertSee($imprint, false)->assertSee($privacy, false);
     }
@@ -104,24 +104,11 @@ class LegalPagesTest extends TestCase
         $this->get(route('legal.privacy'))->assertDontSee('fonts.googleapis.com');
     }
 
-    public function test_registration_requires_and_stores_privacy_consent(): void
+    public function test_privacy_policy_explains_admin_created_accounts(): void
     {
-        $data = [
-            'name' => 'Lena Gruber',
-            'email' => 'lena@example.com',
-            'password' => 'geheim-passwort',
-            'password_confirmation' => 'geheim-passwort',
-            'school_type' => 'AHS',
-        ];
-
-        $this->get(route('register'))->assertSee('Datenschutzerklärung</a>', false);
-
-        $this->post(route('register'), $data)
-            ->assertSessionHasErrors(['privacy' => 'Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.']);
-        $this->assertGuest();
-
-        $this->post(route('register'), $data + ['privacy' => '1'])->assertRedirect(route('dashboard'));
-        $this->assertNotNull(User::firstWhere('email', 'lena@example.com')->privacy_accepted_at);
+        $this->get(route('legal.privacy'))
+            ->assertSee('Dein Konto wird von der Administration angelegt')
+            ->assertSee('Einladungslinks:</strong> sind 7 Tage gültig', false);
     }
 
     public function test_google_vision_uses_the_eu_endpoint_by_default(): void

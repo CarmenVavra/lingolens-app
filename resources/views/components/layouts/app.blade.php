@@ -1,6 +1,6 @@
 {{--
     App shell: navy top nav on laptop, top bar + bottom tab bar on smartphones (< 760px).
-    $active: dashboard | setup | history
+    $active: dashboard | setup | history | students
 --}}
 @props(['title' => null, 'active' => null])
 
@@ -11,6 +11,10 @@
         'setup' => ['label' => 'Neuer Scan', 'url' => route('scans.create')],
         'history' => ['label' => 'Verlauf', 'url' => route('scans.index')],
     ];
+
+    if ($user->isAdmin()) {
+        $navItems['students'] = ['label' => 'Schüler:innen', 'url' => route('admin.students.index')];
+    }
 @endphp
 
 <!DOCTYPE html>
@@ -50,6 +54,9 @@
             <div class="account-menu">
                 <span style="font-weight:600">{{ $user->name }}</span>
                 <span style="font-size:13px;color:var(--color-muted)">{{ $user->chipLabel() }}</span>
+                @if ($user->isAdmin())
+                    <a href="{{ route('admin.students.index') }}" class="btn btn-secondary" style="width:100%;justify-content:flex-start;min-height:44px">Schüler:innen verwalten</a>
+                @endif
                 <a href="{{ route('account.show') }}" class="btn btn-secondary" style="width:100%;justify-content:flex-start;min-height:44px">Konto &amp; Passwort</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -64,6 +71,9 @@
     <main id="main" class="app-main" tabindex="-1">
         @if (session('status'))
             <div class="flash" role="status">{{ session('status') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert-error" role="alert">{{ session('error') }}</div>
         @endif
 
         {{ $slot }}

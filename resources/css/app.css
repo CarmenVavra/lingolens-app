@@ -224,6 +224,12 @@
     .user-chip__text:focus-visible { outline-color: var(--color-peach); }
     .user-chip__name { font-size: 13px; font-weight: 600; }
     .user-chip__meta { font-size: 12px; color: var(--color-peach); }
+    /* Tablets / small laptops: tighter top nav so the admin's 4th link still fits. */
+    @media (max-width: 1023.98px) {
+        .app-nav { padding: 0 20px; }
+        .app-nav__link { padding: 0 10px; }
+        .user-chip { margin-left: 8px; padding-left: 12px; }
+    }
     .logout-btn { color: var(--color-cream); }
     .logout-btn:hover { background: rgba(237, 199, 183, 0.12); color: var(--color-cream); }
     .logout-btn:focus-visible { outline-color: var(--color-peach); }
@@ -382,6 +388,20 @@
     @media (max-width: 479.98px) {
         .scan-row { grid-template-columns: auto minmax(0, 1fr); }
         .scan-row .tag { grid-column: 2; justify-self: start; }
+    }
+
+    /* ── admin: student accounts ─────────────────────────────── */
+    .student-row {
+        display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px 14px; align-items: center;
+        padding: 16px 4px; border-bottom: var(--rule-soft); color: var(--color-navy);
+    }
+    .student-row__actions { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+    .student-row__actions .btn { min-height: 44px; padding: 10px 14px; font-size: 14px; gap: 6px; }
+    .btn-danger { border: 2px solid #9e2416; color: #9e2416; }
+    .btn-danger:hover { background: #fad4cc; color: #7a1b10; }
+    @media (max-width: 479.98px) {
+        .student-row { grid-template-columns: auto minmax(0, 1fr); }
+        .student-row .tag { grid-column: 2; justify-self: start; }
     }
 
     /* ── setup form ──────────────────────────────────────────── */

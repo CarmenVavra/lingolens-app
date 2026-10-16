@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\LingoLens;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
@@ -26,8 +27,9 @@ class LegalController extends Controller
         $sessionHours = (int) round(config('session.lifetime') / 60);
         $logDays = (int) config('logging.channels.daily.days');
         $visionInEu = str_contains((string) config('services.google.vision_endpoint'), 'eu-vision');
+        $invitationDays = LingoLens::invitationDays();
 
-        return view('legal.privacy', compact('legal', 'updatedAt', 'uploadLimitMb', 'sessionHours', 'logDays', 'visionInEu'));
+        return view('legal.privacy', compact('legal', 'updatedAt', 'uploadLimitMb', 'sessionHours', 'logDays', 'visionInEu', 'invitationDays'));
     }
 
     private function updatedAt(): string

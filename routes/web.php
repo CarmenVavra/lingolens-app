@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CorrectionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LegalController;
@@ -20,8 +21,10 @@ Route::get('/datenschutz', [LegalController::class, 'privacy'])->name('legal.pri
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:20,1');
-    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('throttle:10,1');
+
+    // No self-registration: the admin creates accounts, students accept the e-mail invitation.
+    Route::get('/einladung/{token}', [InvitationController::class, 'show'])->name('invitation.show');
+    Route::post('/einladung', [InvitationController::class, 'store'])->middleware('throttle:10,1')->name('invitation.store');
 
     // Passwort vergessen → Link per E-Mail → neues Passwort setzen
     Route::get('/passwort-vergessen', [PasswordResetLinkController::class, 'create'])->name('password.request');
@@ -47,4 +50,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/scans/{scan}', [ScanController::class, 'show'])->name('scans.show');
 
     Route::patch('/corrections/{correction}', [CorrectionController::class, 'update'])->name('corrections.update');
+
+    // Admin: manage student accounts
+    Route::middleware('can:admin')->prefix('admin/schueler')->name('admin.students.')->group(function () {
+        Route::get('/', [StudentController::class, 'index'])->name('index');
+        Route::get('/neu', [StudentController::class, 'create'])->name('create');
+        Route::post('/', [StudentController::class, 'store'])->middleware('throttle:20,1')->name('store');
+        Route::post('/{student}/einladung', [StudentController::class, 'invite'])->middleware(['can:manage-student,student', 'throttle:20,1'])->name('invite');
+        Route::delete('/{student}', [StudentController::class, 'destroy'])->middleware('can:manage-student,student')->name('destroy');
+    });
 });

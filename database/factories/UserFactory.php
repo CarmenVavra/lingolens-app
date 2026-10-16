@@ -36,7 +36,27 @@ class UserFactory extends Factory
             'department' => 'Chemieingenieurwesen',
             'class_name' => '5CHC',
             'grade' => 5,
+            'privacy_accepted_at' => now(),
         ];
+    }
+
+    /**
+     * Created by the admin, invitation not accepted yet.
+     */
+    public function invited(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+            'privacy_accepted_at' => null,
+        ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Administration',
+            'is_admin' => true,
+        ]);
     }
 
     /**

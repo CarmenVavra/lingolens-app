@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use App\Services\Correction\CorrectionPromptBuilder;
 use App\Services\Correction\DemoTextCorrector;
 use App\Services\Correction\OpenAiTextCorrector;
@@ -11,6 +12,7 @@ use App\Services\Ocr\TextRecognizer;
 use App\Support\LingoLens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -48,5 +50,9 @@ class AppServiceProvider extends ServiceProvider
         URL::forceHttps(str_starts_with((string) config('app.url'), 'https://'));
 
         Carbon::setLocale('de');
+
+        // Only admins manage the student accounts.
+        Gate::define('admin', fn (User $user) => $user->isAdmin());
+        Gate::define('manage-student', fn (User $user, User $student) => $user->isAdmin() && ! $student->isAdmin());
     }
 }

@@ -99,6 +99,14 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        // Invitation link for students created by the admin (sets the first password).
+        'invitations' => [
+            'provider' => 'users',
+            'table' => 'invitation_tokens',
+            'expire' => (int) env('LINGOLENS_INVITATION_EXPIRE_MINUTES', 10080),
+            'throttle' => 60,
+        ],
     ],
 
     /*

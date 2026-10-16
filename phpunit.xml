@@ -36,5 +36,6 @@
         <env name="OPENAI_API_KEY" value=""/>
         <env name="LINGOLENS_DEMO_MODE" value=""/>
         <env name="LINGOLENS_DEMO_STEP_DELAY_MS" value="0"/>
+        <env name="LINGOLENS_ADMIN_EMAIL" value=""/>
     </php>
 </phpunit>

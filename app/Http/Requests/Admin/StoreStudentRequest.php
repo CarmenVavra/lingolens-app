@@ -1,18 +1,21 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Admin;
 
 use App\Enums\SchoolType;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
-class RegisterRequest extends FormRequest
+/**
+ * The admin creates a student account. The student sets the password
+ * and confirms the privacy policy via the invitation link.
+ */
+class StoreStudentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return (bool) $this->user()?->can('admin');
     }
 
     /**
@@ -20,24 +23,14 @@ class RegisterRequest extends FormRequest
      */
     public function rules(): array
     {
-        $code = (string) config('lingolens.registration_code');
-
         return [
-            // Optional access code so only the own class can register (and use the paid APIs).
-            'access_code' => $code === '' ? ['nullable'] : ['required', 'string', function (string $attribute, mixed $value, \Closure $fail) use ($code) {
-                if (! hash_equals($code, (string) $value)) {
-                    $fail('Der Zugangscode ist nicht korrekt.');
-                }
-            }],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)],
-            'password' => ['required', 'confirmed', Password::defaults()],
             'school_type' => ['required', Rule::enum(SchoolType::class)],
             'school_form' => ['nullable', 'required_if:school_type,BHS', Rule::in(config('lingolens.school_forms'))],
             'department' => ['nullable', 'required_if:school_type,BHS', Rule::in(config('lingolens.departments'))],
             'class_name' => ['nullable', 'string', 'max:20'],
             'grade' => ['nullable', 'integer', 'between:1,8'],
-            'privacy' => ['accepted'],
         ];
     }
 
@@ -49,14 +42,11 @@ class RegisterRequest extends FormRequest
         return [
             'name' => 'Name',
             'email' => 'E-Mail',
-            'password' => 'Passwort',
             'school_type' => 'Schultyp',
             'school_form' => 'Schulform',
             'department' => 'Fachrichtung',
             'class_name' => 'Klasse',
             'grade' => 'Schulstufe',
-            'access_code' => 'Zugangscode',
-            'privacy' => 'Datenschutzerklärung',
         ];
     }
 
@@ -66,7 +56,7 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'privacy.accepted' => 'Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.',
+            'email.unique' => 'Für diese E-Mail-Adresse gibt es schon ein Konto.',
         ];
     }
 
@@ -77,8 +67,7 @@ class RegisterRequest extends FormRequest
      */
     public function profile(): array
     {
-        $data = $this->safe()->except(['password_confirmation', 'access_code', 'privacy']);
-        $data['privacy_accepted_at'] = now();
+        $data = $this->validated();
 
         if ($data['school_type'] === SchoolType::AHS->value) {
             $data['school_form'] = 'AHS';

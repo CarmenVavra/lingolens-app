@@ -23,6 +23,6 @@ class PasswordResetLinkController extends Controller
     {
         Password::sendResetLink($request->only('email'));
 
-        return back()->with('status', 'Wenn ein Konto mit dieser E-Mail-Adresse existiert, haben wir dir einen Link zum Zurücksetzen geschickt. Er ist 60 Minuten gültig. Keine E-Mail bekommen? Schau im Spam-Ordner nach und prüfe, ob du dich mit genau dieser Adresse registriert hast.');
+        return back()->with('status', 'Wenn ein Konto mit dieser E-Mail-Adresse existiert, haben wir dir einen Link zum Zurücksetzen geschickt. Er ist 60 Minuten gültig. Keine E-Mail bekommen? Schau im Spam-Ordner nach und prüfe, ob dein Konto mit genau dieser Adresse angelegt wurde.');
     }
 }

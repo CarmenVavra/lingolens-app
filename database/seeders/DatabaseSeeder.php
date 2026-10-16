@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\EnsureAdminAccount;
 use App\Actions\StoreScanFeedback;
 use App\Enums\ScanStatus;
 use App\Enums\SchoolType;
@@ -14,11 +15,16 @@ use Illuminate\Database\Seeder;
  * Demo data matching the design handoff (student "Lena Gruber", 5CHC, HTL).
  *
  * Test login: lena@lingolens.test / password
+ * Admin (if LINGOLENS_ADMIN_EMAIL is set): password via "Passwort vergessen?"
  */
 class DatabaseSeeder extends Seeder
 {
-    public function run(StoreScanFeedback $storeFeedback): void
+    public function run(StoreScanFeedback $storeFeedback, EnsureAdminAccount $ensureAdmin): void
     {
+        if (filled(config('lingolens.admin_email'))) {
+            $ensureAdmin->handle((string) config('lingolens.admin_email'));
+        }
+
         $lena = User::factory()->create([
             'name' => 'Lena Gruber',
             'email' => 'lena@lingolens.test',

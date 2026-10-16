@@ -27,8 +27,10 @@ return [
     // Cost protection: scans per student and day (0 = unlimited).
     'daily_scan_limit' => (int) env('LINGOLENS_DAILY_SCAN_LIMIT', 20),
 
-    // If set, registration requires this access code (e.g. shared in class).
-    'registration_code' => env('LINGOLENS_REGISTRATION_CODE'),
+    // There is no self-registration: this admin creates the student accounts.
+    // "php artisan lingolens:install" creates the account if it does not exist;
+    // the password is then set via "Passwort vergessen?" on the login page.
+    'admin_email' => env('LINGOLENS_ADMIN_EMAIL'),
 
     // Date of the written English Matura, used for the countdown on the dashboard.
     'matura_date' => env('LINGOLENS_MATURA_DATE', '2027-05-05'),

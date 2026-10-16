@@ -58,33 +58,6 @@ class ProductionSafeguardsTest extends TestCase
         $this->assertNull($user->remainingScansToday());
     }
 
-    public function test_registration_can_require_an_access_code(): void
-    {
-        config(['lingolens.registration_code' => '5CHC-2027']);
-        $data = [
-            'name' => 'Lena Gruber',
-            'email' => 'lena@example.com',
-            'password' => 'geheim-passwort',
-            'password_confirmation' => 'geheim-passwort',
-            'privacy' => '1',
-            'school_type' => 'AHS',
-        ];
-
-        $this->get(route('register'))->assertSee('Zugangscode deiner Klasse');
-
-        $this->post(route('register'), $data + ['access_code' => 'falsch'])
-            ->assertSessionHasErrors(['access_code' => 'Der Zugangscode ist nicht korrekt.']);
-        $this->assertGuest();
-
-        $this->post(route('register'), $data + ['access_code' => '5CHC-2027'])->assertRedirect(route('dashboard'));
-        $this->assertAuthenticated();
-    }
-
-    public function test_registration_is_open_without_access_code(): void
-    {
-        $this->get(route('register'))->assertDontSee('Zugangscode deiner Klasse');
-    }
-
     public function test_analysis_can_run_right_after_the_response(): void
     {
         Bus::fake();

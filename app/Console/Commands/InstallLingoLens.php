@@ -41,6 +41,12 @@ class InstallLingoLens extends Command
 
         $this->call('migrate', ['--force' => true]);
 
+        if (filled(config('lingolens.admin_email'))) {
+            $this->call('lingolens:admin');
+        } else {
+            $this->warn('LINGOLENS_ADMIN_EMAIL fehlt in der .env – ohne Admin können keine Schüler:innen angelegt werden.');
+        }
+
         foreach (['name' => 'LEGAL_NAME', 'street' => 'LEGAL_STREET', 'city' => 'LEGAL_CITY', 'email' => 'LEGAL_EMAIL'] as $key => $env) {
             if (blank(config('legal.operator.'.$key))) {
                 $this->warn("{$env} fehlt in der .env – Impressum und Datenschutzerklärung sind unvollständig.");
