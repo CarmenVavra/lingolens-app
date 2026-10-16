@@ -20,7 +20,15 @@ class RegisterRequest extends FormRequest
      */
     public function rules(): array
     {
+        $code = (string) config('lingolens.registration_code');
+
         return [
+            // Optional access code so only the own class can register (and use the paid APIs).
+            'access_code' => $code === '' ? ['nullable'] : ['required', 'string', function (string $attribute, mixed $value, \Closure $fail) use ($code) {
+                if (! hash_equals($code, (string) $value)) {
+                    $fail('Der Zugangscode ist nicht korrekt.');
+                }
+            }],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)],
             'password' => ['required', 'confirmed', Password::defaults()],
@@ -46,6 +54,7 @@ class RegisterRequest extends FormRequest
             'department' => 'Fachrichtung',
             'class_name' => 'Klasse',
             'grade' => 'Schulstufe',
+            'access_code' => 'Zugangscode',
         ];
     }
 
@@ -56,7 +65,7 @@ class RegisterRequest extends FormRequest
      */
     public function profile(): array
     {
-        $data = $this->safe()->except('password_confirmation');
+        $data = $this->safe()->except(['password_confirmation', 'access_code']);
 
         if ($data['school_type'] === SchoolType::AHS->value) {
             $data['school_form'] = 'AHS';

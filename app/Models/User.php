@@ -118,6 +118,20 @@ class User extends Authenticatable
             ->implode(' · ');
     }
 
+    /**
+     * Scans left today under the cost limit (null = unlimited).
+     */
+    public function remainingScansToday(): ?int
+    {
+        $limit = (int) config('lingolens.daily_scan_limit');
+
+        if ($limit <= 0) {
+            return null;
+        }
+
+        return max(0, $limit - $this->scans()->where('created_at', '>=', now()->startOfDay())->count());
+    }
+
     public function gradeLabel(): ?string
     {
         return $this->grade ? $this->school_type->gradeLabel($this->grade) : null;

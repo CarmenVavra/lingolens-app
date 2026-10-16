@@ -11,6 +11,7 @@ use App\Services\Ocr\TextRecognizer;
 use App\Support\LingoLens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -41,6 +42,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(! $this->app->isProduction());
+
+        // Generate https:// links when the app runs under an https APP_URL.
+        URL::forceHttps(str_starts_with((string) config('app.url'), 'https://'));
 
         Carbon::setLocale('de');
     }

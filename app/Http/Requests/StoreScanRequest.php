@@ -6,6 +6,7 @@ use App\Enums\ScanSource;
 use App\Enums\SchoolType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 /**
  * Setup & upload form ("Weichen-Formular").
@@ -37,6 +38,22 @@ class StoreScanRequest extends FormRequest
                 'mimes:'.implode(',', ScanSource::allowedExtensions()),
                 'max:'.config('lingolens.max_upload_kb'),
             ],
+        ];
+    }
+
+    /**
+     * Cost protection: limit the number of scans per student and day.
+     *
+     * @return list<callable>
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                if ($this->user()?->remainingScansToday() === 0) {
+                    $validator->errors()->add('file', 'Du hast dein Tageslimit von '.config('lingolens.daily_scan_limit').' Texten erreicht. Morgen geht es weiter!');
+                }
+            },
         ];
     }
 

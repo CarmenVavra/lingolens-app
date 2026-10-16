@@ -35,7 +35,15 @@ class ProcessTextScan implements ShouldQueue
 
     public function handle(DocumentTextExtractor $extractor, TextCorrector $corrector, StoreScanFeedback $storeFeedback): void
     {
-        $scan = $this->scan;
+        $scan = $this->scan->refresh();
+
+        // Already finished or given up (e.g. by scans:fail-stale).
+        if (! $scan->isProcessing()) {
+            return;
+        }
+
+        // Also covers the case where the job runs right after the HTTP response.
+        @set_time_limit($this->timeout);
 
         try {
             // 1. Read the text

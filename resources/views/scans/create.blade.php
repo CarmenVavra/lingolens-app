@@ -17,6 +17,9 @@
             <span class="kicker">Neuer Scan</span>
             <h1 class="page-title">Was hast du geschrieben?</h1>
             <p>LingoLens passt die Korrektur an Schultyp, Fachrichtung und Textsorte an.</p>
+            @if ($remainingScans !== null)
+                <p class="setup-step__hint">Heute noch {{ $remainingScans }} {{ $remainingScans === 1 ? 'Text' : 'Texte' }} möglich.</p>
+            @endif
         </div>
 
         @if ($errors->any())

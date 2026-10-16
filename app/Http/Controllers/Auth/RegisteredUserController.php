@@ -16,8 +16,9 @@ class RegisteredUserController extends Controller
     {
         $departments = config('lingolens.departments');
         $schoolForms = array_values(array_diff(config('lingolens.school_forms'), ['AHS']));
+        $requiresCode = filled(config('lingolens.registration_code'));
 
-        return view('auth.register', compact('departments', 'schoolForms'));
+        return view('auth.register', compact('departments', 'schoolForms', 'requiresCode'));
     }
 
     public function store(RegisterRequest $request): RedirectResponse

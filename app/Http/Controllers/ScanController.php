@@ -51,8 +51,9 @@ class ScanController extends Controller
             ->push('application/pdf', 'image/*', 'text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
             ->implode(',');
         $demoMode = LingoLens::demoMode();
+        $remainingScans = $user->remainingScansToday();
 
-        return view('scans.create', compact('schoolType', 'department', 'textType', 'textTypes', 'departments', 'extensions', 'accept', 'demoMode'));
+        return view('scans.create', compact('schoolType', 'department', 'textType', 'textTypes', 'departments', 'extensions', 'accept', 'demoMode', 'remainingScans'));
     }
 
     public function store(StoreScanRequest $request, CreateScan $createScan): RedirectResponse

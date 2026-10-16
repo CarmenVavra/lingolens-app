@@ -14,6 +14,17 @@
     <form method="POST" action="{{ route('register') }}" novalidate x-data="{ school: @js(old('school_type', 'BHS')) }">
         @csrf
 
+        @if ($requiresCode)
+            <div class="field">
+                <label for="access_code">Zugangscode deiner Klasse</label>
+                <input id="access_code" type="text" name="access_code" value="{{ old('access_code') }}" class="input" required autocomplete="off"
+                    @error('access_code') aria-invalid="true" aria-describedby="access_code-error" @enderror>
+                @error('access_code')
+                    <span id="access_code-error" class="field-error">{{ $message }}</span>
+                @enderror
+            </div>
+        @endif
+
         @foreach ([
             ['name', 'Name', 'text', 'name'],
             ['email', 'E-Mail', 'email', 'username'],

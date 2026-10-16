@@ -33,7 +33,13 @@ class CreateScan
             'original_name' => $file ? Str::limit($file->getClientOriginalName(), 200, '') : null,
         ]);
 
-        ProcessTextScan::dispatch($scan);
+        // Shared hosting without a running worker: analyse right after the response
+        // is sent (PHP-FPM). Otherwise the queue (cron or worker) picks it up.
+        if (config('lingolens.process_after_response')) {
+            ProcessTextScan::dispatchAfterResponse($scan);
+        } else {
+            ProcessTextScan::dispatch($scan);
+        }
 
         return $scan;
     }

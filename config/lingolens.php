@@ -20,6 +20,16 @@ return [
 
     'openai_model' => env('OPENAI_MODEL', 'gpt-4o'),
 
+    // Run the analysis directly after the upload response instead of waiting for
+    // the queue (useful on shared hosting with PHP-FPM; the cron stays as fallback).
+    'process_after_response' => (bool) env('LINGOLENS_PROCESS_AFTER_RESPONSE', false),
+
+    // Cost protection: scans per student and day (0 = unlimited).
+    'daily_scan_limit' => (int) env('LINGOLENS_DAILY_SCAN_LIMIT', 20),
+
+    // If set, registration requires this access code (e.g. shared in class).
+    'registration_code' => env('LINGOLENS_REGISTRATION_CODE'),
+
     // Date of the written English Matura, used for the countdown on the dashboard.
     'matura_date' => env('LINGOLENS_MATURA_DATE', '2027-05-05'),
 
