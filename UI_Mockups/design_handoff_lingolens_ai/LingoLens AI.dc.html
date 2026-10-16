@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-4d338549-1163-46db-bfa3-3ede5fb15b7d/styles.css">
+<script src="_ds/modernist-4d338549-1163-46db-bfa3-3ede5fb15b7d/_ds_bundle.js"></script>
+<style>
+:root{--color-bg:#EEE2DC;--color-surface:#F8F1EE;--color-text:#123C69;--color-accent:#AC3B61;--color-accent-100:#F6DDE5;--color-accent-600:#952F52;--color-accent-700:#7A2443;--color-accent-800:#5E1A33;--color-divider:color-mix(in srgb,#123C69 35%,transparent)}
+html,body{margin:0;height:100%}
+body{background:#EEE2DC}
+a{color:#AC3B61}a:hover{color:#7A2443}
+.btn-primary:disabled{opacity:.4}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ deskBg }};display:flex;justify-content:center;align-items:flex-start;padding:{{ deskPad }};font-family:var(--font-body);color:#123C69;box-sizing:border-box">
+<div style="position:relative;width:{{ frameW }};height:{{ frameH }};border:{{ frameBorder }};box-shadow:{{ frameShadow }};background:#EEE2DC;overflow:hidden;display:flex;flex-direction:column;flex:none;max-width:100%">
+
+<sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+<nav style="display:flex;align-items:center;gap:8px;padding:0 40px;height:64px;background:#123C69;color:#EEE2DC;flex:none">
+<button onClick="{{ goDash }}" style="display:flex;align-items:center;gap:10px;background:none;border:0;color:#EEE2DC;cursor:pointer;padding:0;margin-right:auto;font:inherit">
+<span style="width:32px;height:32px;background:#AC3B61;display:grid;place-items:center"><span style="width:14px;height:14px;border:3px solid #EDC7B7;border-radius:50%"></span></span>
+<span style="font-weight:800;font-size:19px;letter-spacing:-.01em">LingoLens <span style="color:#EDC7B7">AI</span></span>
+</button>
+<sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+<button onClick="{{ n.onClick }}" style="height:64px;padding:0 16px;background:none;border:0;border-bottom:4px solid {{ n.line }};color:#EEE2DC;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:rgba(237,199,183,.12)">{{ n.label }}</button>
+</sc-for>
+<div style="display:flex;align-items:center;gap:10px;margin-left:16px;padding-left:20px;border-left:2px solid rgba(238,226,220,.25)">
+<span style="width:34px;height:34px;background:#EDC7B7;color:#123C69;display:grid;place-items:center;font-weight:800;font-size:14px">LG</span>
+<span style="display:flex;flex-direction:column;line-height:1.2"><span style="font-size:13px;font-weight:600">Lena Gruber</span><span style="font-size:11px;color:#EDC7B7">5CHC · HTL</span></span>
+</div>
+</nav>
+</sc-if>
+
+<sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px;padding:0 16px;height:56px;background:#123C69;color:#EEE2DC;flex:none">
+<span style="width:28px;height:28px;background:#AC3B61;display:grid;place-items:center"><span style="width:12px;height:12px;border:3px solid #EDC7B7;border-radius:50%"></span></span>
+<span style="font-weight:800;font-size:17px;margin-right:auto">LingoLens <span style="color:#EDC7B7">AI</span></span>
+<span style="width:32px;height:32px;background:#EDC7B7;color:#123C69;display:grid;place-items:center;font-weight:800;font-size:13px">LG</span>
+</div>
+</sc-if>
+
+<div ref="{{ scrollRef }}" style="flex:1;min-height:0;overflow:auto">
+<div style="max-width:1240px;margin:0 auto;padding:{{ pad }};box-sizing:border-box">
+
+<sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:32px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));border:2px solid #123C69">
+<div style="background:#EDC7B7;padding:{{ cardPad }};display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#7A2443">Englisch-Matura Coach</span>
+<h1 style="font-size:{{ heroSize }};margin:0;line-height:.95;letter-spacing:-.03em;color:#123C69">Servus, Lena!</h1>
+<div style="display:flex;flex-wrap:wrap;gap:6px">
+<span class="tag" style="background:#123C69;color:#EEE2DC;font-weight:600">BHS · HTL</span>
+<span class="tag" style="background:#E6DAF7;color:#4D2A88;font-weight:600">Chemieingenieurwesen</span>
+<span class="tag" style="background:#EEE2DC;color:#123C69;font-weight:600">5. Jahrgang</span>
+</div>
+<p style="margin:0;font-size:16px;max-width:440px;text-wrap:pretty">Noch 182 Tage bis zur Matura. Fotografiere deinen handgeschriebenen Text – LingoLens korrigiert ihn auf B2-Niveau.</p>
+<button class="btn btn-primary" onClick="{{ goSetup }}" style="font-size:18px;padding:18px 22px;justify-content:flex-start;gap:12px;min-width:min(100%,320px);margin-top:4px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+<span style="margin-right:auto">Neuen Text scannen</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+</button>
+</div>
+<div style="background:#123C69;color:#EEE2DC;padding:{{ cardPad }};display:flex;flex-direction:column;gap:14px;justify-content:space-between">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#EDC7B7">Matura-Ready-Score</span>
+<div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:{{ scoreSize }};font-weight:800;line-height:.85;letter-spacing:-.04em;color:#EDC7B7">68</span><span style="font-size:36px;font-weight:800">%</span></div>
+<div style="display:grid;grid-template-columns:repeat(20,1fr);gap:3px">
+<sc-for list="{{ cells }}" as="c" hint-placeholder-count="20"><span style="height:22px;background:{{ c.bg }}"></span></sc-for>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#BAB2B5"><span>0</span><span>B2-sicher ab 80</span><span>100</span></div>
+<p style="margin:0;font-size:14px;color:#EEE2DC">+9 Punkte seit letztem Monat. Größter Hebel: Fachbegriffe.</p>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
+<h2 style="margin:0;font-size:{{ h2Size }}">Deine Fehler-Verteilung</h2>
+<span style="font-size:13px;color:#4A5F7A">46 Korrekturen aus 12 Scans</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px">
+<sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+<button onClick="{{ s.onClick }}" style="background:{{ s.tint }};border:2px solid #123C69;border-top:10px solid {{ s.base }};padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left;font:inherit;color:#123C69;cursor:pointer" style-hover="box-shadow:var(--shadow-md)">
+<span style="display:flex;justify-content:space-between;align-items:center;width:100%"><span style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:{{ s.deep }}">{{ s.label }}</span><span style="font-size:12px;font-weight:600;color:{{ s.deep }}">#{{ s.rank }}</span></span>
+<span style="font-size:60px;font-weight:800;line-height:.9;letter-spacing:-.03em;color:{{ s.deep }}">{{ s.count }}</span>
+<span style="height:8px;background:rgba(255,255,255,.7);width:100%;display:block"><span style="display:block;height:8px;width:{{ s.pct }};background:{{ s.base }}"></span></span>
+<span style="font-size:13px">{{ s.pct }} aller Fehler</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px;align-items:start">
+<div style="background:#7E4FC9;color:#fff;padding:{{ cardPad }};display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#E6DAF7">Dein Fokus diese Woche</span>
+<h3 style="margin:0;font-size:34px;line-height:1">Fachbegriffe statt Alltagssprache</h3>
+<p style="margin:0;font-size:15px;color:#fff;text-wrap:pretty">17 deiner 46 Fehler sind Wörter wie „makes heat“ statt „exothermic reaction“. Übe genau diese Stellen in deinem letzten Lab Report.</p>
+<button class="btn" onClick="{{ practiceTech }}" style="background:#fff;color:#4D2A88;padding:14px 18px;font-size:15px;justify-content:flex-start;gap:10px;margin-top:4px" style-hover="background:#E6DAF7">Fachbegriffe üben<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+</div>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:2px solid #123C69">
+<h3 style="margin:0;font-size:22px">Letzte Scans</h3>
+<button class="btn btn-ghost" onClick="{{ goHist }}">Alle anzeigen</button>
+</div>
+<sc-for list="{{ recent }}" as="h" hint-placeholder-count="3">
+<button onClick="{{ h.onClick }}" style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;padding:14px 4px;border:0;border-bottom:2px solid rgba(18,60,105,.18);background:transparent;text-align:left;cursor:{{ h.cursor }};font:inherit;color:#123C69" style-hover="background:rgba(237,199,183,.45)">
+<span style="width:44px;height:44px;background:{{ h.iconBg }};color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px">{{ h.num }}</span>
+<span style="display:flex;flex-direction:column;min-width:0;gap:2px"><span style="font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.title }}</span><span style="font-size:12px;color:#4A5F7A">{{ h.sub }}</span></span>
+<span class="tag" style="background:{{ h.sBg }};color:{{ h.sColor }};font-weight:600">{{ h.sLabel }}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:24px;max-width:880px">
+<button class="btn btn-ghost" onClick="{{ goDash }}" style="align-self:flex-start;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Dashboard</button>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#AC3B61">Neuer Scan</span>
+<h1 style="margin:0;font-size:{{ h1Size }};line-height:1">Was hast du geschrieben?</h1>
+<p style="margin:0;font-size:16px;max-width:560px">LingoLens passt die Korrektur an Schultyp, Fachrichtung und Textsorte an.</p>
+</div>
+<div style="border:2px solid #123C69;background:#F8F1EE">
+<div style="padding:{{ cardPad }};display:flex;flex-direction:column;gap:16px;border-bottom:2px solid #123C69">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:32px;height:32px;background:#AC3B61;color:#fff;display:grid;place-items:center;font-weight:800">1</span><h3 style="margin:0;font-size:20px">Schultyp</h3></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<label class="radio" style="align-items:flex-start;padding:16px;border:2px solid #123C69;background:{{ ahsBg }};color:{{ ahsColor }};cursor:pointer">
+<input type="radio" name="school" checked="{{ isAHS }}" onChange="{{ pickAHS }}">
+<span class="dot" style="margin-top:6px;border-color:currentColor"></span>
+<span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:24px;font-weight:800;line-height:1.1">AHS</span><span style="font-size:13px">Allgemeinbildende höhere Schule</span></span>
+</label>
+<label class="radio" style="align-items:flex-start;padding:16px;border:2px solid #123C69;background:{{ bhsBg }};color:{{ bhsColor }};cursor:pointer">
+<input type="radio" name="school" checked="{{ isBHS }}" onChange="{{ pickBHS }}">
+<span class="dot" style="margin-top:6px;border-color:currentColor"></span>
+<span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:24px;font-weight:800;line-height:1.1">BHS</span><span style="font-size:13px">HTL, HAK, HLW …</span></span>
+</label>
+</div>
+<sc-if value="{{ isBHS }}" hint-placeholder-val="{{ true }}">
+<div class="field" style="display:flex;flex-direction:column;gap:8px">
+<label style="font-size:13px;font-weight:600;color:#123C69;margin:0">Fachrichtung</label>
+<select class="input" value="{{ department }}" onChange="{{ onDept }}" style="font-size:16px;min-height:48px;background:#fff;border:2px solid #123C69;color:#123C69">
+<sc-for list="{{ departments }}" as="d" hint-placeholder-count="6"><option value="{{ d }}">{{ d }}</option></sc-for>
+</select>
+<sc-if value="{{ isChem }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:10px;align-items:flex-start;background:#E6DAF7;color:#4D2A88;padding:12px 14px;font-size:14px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M10 2v7.31"></path><path d="M14 9.3V2"></path><path d="M8.5 2h7"></path><path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path></svg>
+<span><b>Fachbegriff-Check Chemie aktiv.</b> Alltagssprache wird durch chemische Terminologie ersetzt und lila markiert.</span>
+</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+<div style="padding:{{ cardPad }};display:flex;flex-direction:column;gap:16px;border-bottom:2px solid #123C69">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:32px;height:32px;background:#2D7DD2;color:#fff;display:grid;place-items:center;font-weight:800">2</span><h3 style="margin:0;font-size:20px">Textsorte</h3><span style="font-size:13px;color:#4A5F7A">Matura-Textsorten {{ school }}</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ textTypes }}" as="t" hint-placeholder-count="6">
+<button onClick="{{ t.onClick }}" style="padding:12px 16px;border:2px solid #123C69;background:{{ t.bg }};color:{{ t.color }};font:inherit;font-size:15px;font-weight:600;cursor:pointer;min-height:48px" style-hover="box-shadow:inset 0 -4px 0 #AC3B61">{{ t.label }}</button>
+</sc-for>
+</div>
+</div>
+<div style="padding:{{ cardPad }};display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:32px;height:32px;background:#F2B233;color:#123C69;display:grid;place-items:center;font-weight:800">3</span><h3 style="margin:0;font-size:20px">Foto deines Textes</h3></div>
+<sc-if value="{{ noImage }}" hint-placeholder-val="{{ true }}">
+<label style="display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:28px;border:2px dashed #123C69;background:#fff;cursor:pointer" style-hover="background:#FDF6F2">
+<input type="file" accept="image/*" capture="environment" onChange="{{ onFile }}" style="display:none">
+<span style="width:56px;height:56px;background:#EDC7B7;display:grid;place-items:center;color:#AC3B61"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg></span>
+<span style="font-size:20px;font-weight:800">{{ uploadLabel }}</span>
+<span style="font-size:14px;color:#4A5F7A">JPG, PNG oder HEIC · max. 10 MB · gutes Licht, von oben fotografiert</span>
+</label>
+<button class="btn btn-ghost" onClick="{{ useDemo }}" style="align-self:flex-start">Kein Foto zur Hand? Beispielfoto verwenden</button>
+</sc-if>
+<sc-if value="{{ hasImage }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:center;background:#fff;border:2px solid #123C69;padding:12px">
+<div style="width:120px;height:150px;background:#EEE2DC;overflow:hidden;position:relative">
+<sc-if value="{{ hasRealImg }}" hint-placeholder-val="{{ false }}"><div style="width:100%;height:100%;background-image:{{ previewBg }};background-size:cover;background-position:center"></div></sc-if>
+<sc-if value="{{ demo }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:10px;background:repeating-linear-gradient(#fff 0 13px,#BAB2B5 13px 14px);display:flex;align-items:flex-end;padding:6px;font-size:10px;color:#4A5F7A">Beispielfoto</div></sc-if>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+<span style="display:flex;align-items:center;gap:6px;color:#1E9E8B;font-weight:600;font-size:13px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Foto bereit</span>
+<span style="font-weight:800;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ fileName }}</span>
+<button class="btn btn-ghost" onClick="{{ clearImage }}" style="align-self:flex-start">Anderes Foto wählen</button>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+<button class="btn btn-primary" disabled="{{ cantSubmit }}" onClick="{{ start }}" style="font-size:18px;padding:18px 22px;justify-content:flex-start;gap:12px;align-self:stretch">
+<span style="margin-right:auto">Text analysieren</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isProc }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));border:2px solid #123C69;max-width:1000px">
+<div style="background:#BAB2B5;min-height:{{ procImgH }};position:relative;overflow:hidden">
+<sc-if value="{{ hasRealImg }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;background-image:{{ previewBg }};background-size:cover;background-position:center"></div></sc-if>
+<sc-if value="{{ demoOrNone }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:28px;background:repeating-linear-gradient(#fff 0 23px,#d9d1cd 23px 24px);box-shadow:var(--shadow-lg)"></div></sc-if>
+<div style="position:absolute;left:0;right:0;top:{{ scanTop }};height:4px;background:#AC3B61;box-shadow:0 0 24px 6px rgba(172,59,97,.5);transition:top 1.4s linear;opacity:{{ scanOpacity }}"></div>
+</div>
+<div style="background:#F8F1EE;padding:{{ cardPad }};display:flex;flex-direction:column;gap:18px">
+<sc-if value="{{ procRunning }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#AC3B61">Scan #{{ nextId }} · {{ textType }}</span>
+<h2 style="margin:0;font-size:{{ h2Size }};line-height:1.05">{{ procTitle }}</h2>
+<p style="margin:0;font-size:15px">Dauert meist unter einer Minute. Du kannst die App schließen – wir sagen Bescheid, sobald dein Feedback fertig ist.</p>
+</div>
+<div style="height:12px;background:#EDC7B7"><div style="height:12px;width:{{ procPct }};background:#AC3B61;transition:width .5s"></div></div>
+</sc-if>
+<sc-if value="{{ procFailed }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+<span style="width:48px;height:48px;background:#E0412F;color:#fff;display:grid;place-items:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></span>
+<h2 style="margin:0;font-size:{{ h2Size }};line-height:1.05">Text konnte nicht gelesen werden</h2>
+<p style="margin:0;font-size:15px">Die Handschrift-Erkennung hat zu wenig Text gefunden. Fotografiere bei gutem Licht, gerade von oben und ohne Schatten.</p>
+</div>
+</sc-if>
+<div style="display:flex;flex-direction:column;border-top:2px solid #123C69">
+<sc-for list="{{ procSteps }}" as="p" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:2px solid rgba(18,60,105,.15);opacity:{{ p.opacity }}">
+<span style="width:32px;height:32px;flex:none;background:{{ p.bg }};color:{{ p.color }};display:grid;place-items:center;font-weight:800;font-size:14px">{{ p.mark }}</span>
+<span style="display:flex;flex-direction:column"><span style="font-weight:600;font-size:15px">{{ p.label }}</span><span style="font-size:12px;color:#4A5F7A">{{ p.sub }}</span></span>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ procFailed }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<button class="btn btn-primary" onClick="{{ goSetup }}" style="padding:14px 18px;font-size:15px">Neues Foto aufnehmen</button>
+<button class="btn btn-secondary" onClick="{{ goDash }}" style="padding:14px 18px;font-size:15px;border:2px solid #123C69">Zum Dashboard</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCorr }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:20px">
+<button class="btn btn-ghost" onClick="{{ goDash }}" style="align-self:flex-start;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Dashboard</button>
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#AC3B61">Scan #{{ meta.id }} · Korrektur-Modus</span>
+<h1 style="margin:0;font-size:{{ h1Size }};line-height:1.02;text-wrap:balance">{{ sample.title }}</h1>
+<div style="display:flex;flex-wrap:wrap;gap:6px">
+<sc-for list="{{ metaTags }}" as="m" hint-placeholder-count="3"><span class="tag" style="background:#123C69;color:#EEE2DC;font-weight:600">{{ m }}</span></sc-for>
+</div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 0;border-top:2px solid #123C69;border-bottom:2px solid #123C69">
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ legend }}" as="l" hint-placeholder-count="4">
+<button onClick="{{ l.onClick }}" style="display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:40px;border:2px solid {{ l.base }};background:{{ l.bg }};color:{{ l.deep }};font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:{{ l.strike }}">
+<span style="width:12px;height:12px;background:{{ l.base }}"></span>{{ l.label }}<span style="font-weight:800">{{ l.count }}</span>
+</button>
+</sc-for>
+</div>
+<div class="seg" style="border:2px solid #123C69">
+<label class="seg-opt" style="font-weight:600;min-height:40px"><input type="radio" name="view" checked="{{ viewMarked }}" onChange="{{ showMarked }}">Markiert</label>
+<label class="seg-opt" style="font-weight:600;min-height:40px;border-left:2px solid #123C69"><input type="radio" name="view" checked="{{ showCorrected }}" onChange="{{ showFixed }}">Korrigiert</label>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="flex:1;height:10px;background:#fff;border:2px solid #123C69"><div style="height:100%;width:{{ donePct }};background:#1E9E8B;transition:width .4s"></div></div>
+<span style="font-size:14px;font-weight:600;white-space:nowrap">{{ doneCount }} / {{ total }} verstanden</span>
+</div>
+<div style="display:grid;grid-template-columns:{{ corrCols }};gap:24px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="background:#fff;border:2px solid #123C69;padding:{{ paperPad }};display:flex;flex-direction:column;gap:18px">
+<sc-for list="{{ paras }}" as="p" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:6px">
+<sc-if value="{{ p.hasH }}" hint-placeholder-val="{{ false }}"><h4 style="margin:0;font-size:17px;color:#123C69">{{ p.h }}</h4></sc-if>
+<p style="margin:0;font-size:{{ textSize }};line-height:2.1;color:#20304A">
+<sc-for list="{{ p.segs }}" as="g" hint-placeholder-count="5"><span onClick="{{ g.onClick }}" style="background:{{ g.bg }};border-bottom:{{ g.line }};color:{{ g.color }};padding:{{ g.pad }};cursor:{{ g.cursor }};font-weight:{{ g.weight }};transition:background .15s">{{ g.text }}</span></sc-for>
+</p>
+</div>
+</sc-for>
+</div>
+<span style="font-size:13px;color:#4A5F7A">{{ paperHint }}</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;position:{{ panelPos }};top:0">
+<sc-if value="{{ deskSel }}" hint-placeholder-val="{{ false }}">
+<div style="background:#fff;border:2px solid #123C69;border-top:10px solid {{ sel.base }};display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;border-bottom:2px solid rgba(18,60,105,.15)">
+<span class="tag" style="background:{{ sel.tint }};color:{{ sel.deep }};font-weight:800;font-size:12px">{{ sel.label }}</span>
+<span style="font-size:13px;color:#4A5F7A;margin-right:auto">{{ sel.pos }} von {{ sel.count }}</span>
+<button class="btn btn-icon btn-secondary" onClick="{{ sel.prev }}" aria-label="Vorheriger Fehler"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+<button class="btn btn-icon btn-secondary" onClick="{{ sel.next }}" aria-label="Nächster Fehler"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+<div style="padding:18px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:#4A5F7A">Dein Text</span><span style="font-size:18px;text-decoration:line-through;text-decoration-color:#E0412F;text-decoration-thickness:2px">{{ sel.wrong }}</span></div>
+<div style="background:{{ sel.tint }};padding:14px 16px;display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:{{ sel.deep }}">B2-Äquivalent</span><span style="font-size:24px;font-weight:800;line-height:1.15;color:{{ sel.deep }}">{{ sel.correct }}</span></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:#4A5F7A">Warum?</span><p style="margin:0;font-size:15px;line-height:1.5;text-wrap:pretty">{{ sel.expl }}</p></div>
+<button class="btn btn-primary" onClick="{{ sel.markDone }}" style="padding:14px 16px;font-size:15px;justify-content:flex-start;gap:8px;background:{{ sel.doneBg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ sel.doneLabel }}</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ deskEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="background:#EDC7B7;border:2px solid #123C69;padding:20px;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+<span style="font-size:44px;font-weight:800;line-height:.9;color:#AC3B61">{{ total }}</span>
+<span style="font-size:18px;font-weight:800">Stellen zum Verbessern</span>
+<p style="margin:0;font-size:14px">Klicke auf eine farbige Markierung im Text. Hier erscheint die Erklärung und das passende B2-Äquivalent.</p>
+<button class="btn btn-primary" onClick="{{ selectFirst }}" style="padding:12px 16px">Erste Stelle ansehen</button>
+</div>
+</sc-if>
+<div style="background:#AC3B61;color:#fff;padding:20px;display:flex;flex-direction:column;gap:8px">
+<span style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#EDC7B7"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path></svg>Matura-Tipp</span>
+<p style="margin:0;font-size:15px;line-height:1.5;color:#fff">{{ sample.tip }}</p>
+</div>
+<div style="background:#D3E5F8;border:2px solid #123C69;padding:20px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#164E8C">Textsorten-Check · {{ meta.type }}</span>
+<p style="margin:0;font-size:15px;line-height:1.5">{{ sample.check }}</p>
+</div>
+<div style="background:#F8F1EE;border:2px solid #123C69;padding:20px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#AC3B61">KI-Zusammenfassung</span>
+<p style="margin:0;font-size:15px;line-height:1.5">{{ sample.summary }}</p>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isHist }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:20px;max-width:880px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#AC3B61">Verlauf</span>
+<h1 style="margin:0;font-size:{{ h1Size }};line-height:1">Meine Scans</h1>
+</div>
+<div style="display:flex;flex-direction:column;border-top:2px solid #123C69">
+<sc-for list="{{ history }}" as="h" hint-placeholder-count="4">
+<button onClick="{{ h.onClick }}" style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;padding:16px 4px;border:0;border-bottom:2px solid rgba(18,60,105,.18);background:transparent;text-align:left;cursor:{{ h.cursor }};font:inherit;color:#123C69" style-hover="background:rgba(237,199,183,.45)">
+<span style="width:48px;height:48px;background:{{ h.iconBg }};color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px">{{ h.num }}</span>
+<span style="display:flex;flex-direction:column;min-width:0;gap:2px"><span style="font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.title }}</span><span style="font-size:12px;color:#4A5F7A">{{ h.sub }}</span></span>
+<span class="tag" style="background:{{ h.sBg }};color:{{ h.sColor }};font-weight:600">{{ h.sLabel }}</span>
+</button>
+</sc-for>
+</div>
+<button class="btn btn-primary" onClick="{{ goSetup }}" style="font-size:16px;padding:16px 20px;justify-content:flex-start;gap:10px;align-self:flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Neuen Text scannen</button>
+</div>
+</sc-if>
+
+</div>
+</div>
+
+<sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+<div style="flex:none;display:grid;grid-template-columns:1fr 1fr 1fr;height:68px;background:#fff;border-top:2px solid #123C69">
+<button onClick="{{ goDash }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:0;font:inherit;font-size:11px;font-weight:600;color:{{ tabDash }};cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>Start</button>
+<button onClick="{{ goSetup }}" style="display:flex;align-items:center;justify-content:center;background:none;border:0;cursor:pointer;padding:0"><span style="width:56px;height:56px;margin-top:-22px;background:#AC3B61;color:#fff;display:grid;place-items:center;border:3px solid #fff;box-shadow:var(--shadow-md)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg></span></button>
+<button onClick="{{ goHist }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:0;font:inherit;font-size:11px;font-weight:600;color:{{ tabHist }};cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>Verlauf</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ mobileSel }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:30;max-height:72%;overflow:auto;background:#fff;border-top:10px solid {{ sel.base }};box-shadow:0 -12px 32px rgba(18,60,105,.3)">
+<div style="display:flex;align-items:center;gap:6px;padding:10px 10px 10px 16px;border-bottom:2px solid rgba(18,60,105,.15)">
+<span class="tag" style="background:{{ sel.tint }};color:{{ sel.deep }};font-weight:800;font-size:12px">{{ sel.label }}</span>
+<span style="font-size:13px;color:#4A5F7A;margin-right:auto">{{ sel.pos }} / {{ sel.count }}</span>
+<button class="btn btn-icon btn-secondary" onClick="{{ sel.prev }}" style="width:44px;height:44px" aria-label="Zurück"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+<button class="btn btn-icon btn-secondary" onClick="{{ sel.next }}" style="width:44px;height:44px" aria-label="Weiter"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+<button class="btn btn-icon" onClick="{{ closeSel }}" style="width:44px;height:44px" aria-label="Schließen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:#4A5F7A">Dein Text</span><span style="font-size:17px;text-decoration:line-through;text-decoration-color:#E0412F;text-decoration-thickness:2px">{{ sel.wrong }}</span></div>
+<div style="background:{{ sel.tint }};padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:{{ sel.deep }}">B2-Äquivalent</span><span style="font-size:22px;font-weight:800;line-height:1.15;color:{{ sel.deep }}">{{ sel.correct }}</span></div>
+<p style="margin:0;font-size:15px;line-height:1.5">{{ sel.expl }}</p>
+<button class="btn btn-primary" onClick="{{ sel.markDone }}" style="padding:14px 16px;font-size:15px;justify-content:flex-start;gap:8px;min-height:48px;background:{{ sel.doneBg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ sel.doneLabel }}</button>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;device&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;laptop&quot;,&quot;smartphone&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;'auto'|'laptop'|'smartphone'&quot;,&quot;section&quot;:&quot;Vorschau&quot;},&quot;markStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;fill&quot;,&quot;underline&quot;],&quot;default&quot;:&quot;fill&quot;,&quot;tsType&quot;:&quot;'fill'|'underline'&quot;,&quot;section&quot;:&quot;Korrektur&quot;},&quot;simulateFail&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Testen&quot;}}">
+const T = {
+  'Grammar': { label: 'Grammatik', base: '#E0412F', tint: '#FAD4CC', deep: '#9E2416' },
+  'Vocabulary': { label: 'Vokabular', base: '#2D7DD2', tint: '#D3E5F8', deep: '#164E8C' },
+  'Style': { label: 'Stil', base: '#F2B233', tint: '#FCEBB8', deep: '#7A5200' },
+  'Technical Term': { label: 'Fachbegriff', base: '#7E4FC9', tint: '#E6DAF7', deep: '#4D2A88' }
+};
+const ORDER = ['Grammar', 'Vocabulary', 'Style', 'Technical Term'];
+const TYPES = {
+  AHS: ['Essay', 'Article', 'Report', 'Letter to the Editor', 'Blog Post'],
+  BHS: ['Technical Report', 'Executive Summary', 'Formal Letter', 'Email', 'Essay', 'Report']
+};
+const DEPTS = ['Chemieingenieurwesen', 'Maschinenbau', 'Elektrotechnik', 'Informationstechnologie', 'Wirtschaftsingenieurwesen', 'Bautechnik', 'HAK – Wirtschaft', 'HLW – Wirtschaftliche Berufe'];
+const ESSAYISH = ['Essay', 'Article', 'Letter to the Editor', 'Blog Post'];
+const SAMPLES = {
+  bhs: {
+    title: 'Lab Report: Distillation of an Ethanol–Water Mixture', short: 'Lab Report: Distillation',
+    paras: [
+      { h: '1  Introduction', t: 'In this report [[e1]] how we [[e2]] to separate ethanol and water by [[e3]]. The aim was to collect [[e4]] about the boiling points of both liquids.' },
+      { h: '2  Method', t: 'First, we mixed 50 ml of ethanol with 50 ml of water. When we added a few drops of sulfuric acid, [[e5]]. The mixture was heated [[e6]] and we had to [[e7]] the temperature very carefully. Afterwards we had to [[e8]] to remove [[e9]] solid particles.' },
+      { h: '3  Results', t: 'We measured the [[e10]] of ethanol in the distillate. [[e11]], because we reached a purity of 89 %.' }
+    ],
+    errors: {
+      e1: { w: 'we describes', c: 'we describe', t: 'Grammar', x: 'Nach „we“ steht das Verb ohne -s. Das -s gibt es nur bei he / she / it (3. Person Singular).' },
+      e2: { w: 'make an experiment', c: 'conducted an experiment', t: 'Vocabulary', x: '„Ein Experiment machen“ ist eine Germanismus-Falle. Im Englischen: conduct oder carry out an experiment – und Past Simple, weil es abgeschlossen ist.' },
+      e3: { w: 'distilate', c: 'fractional distillation', t: 'Technical Term', x: 'Falsch geschrieben und unpräzise. Für die Trennung zweier Flüssigkeiten mit unterschiedlichen Siedepunkten lautet der Fachbegriff fractional distillation.' },
+      e4: { w: 'informations', c: 'information', t: 'Grammar', x: 'information ist im Englischen unzählbar – kein Plural-s. Zum Zählen: pieces of information.' },
+      e5: { w: 'the chemical reaction makes heat', c: 'an exothermic reaction occurred', t: 'Technical Term', x: '„makes heat“ ist Alltagssprache. Eine Reaktion, die Wärme freisetzt, heißt exothermic reaction.' },
+      e6: { w: 'since 20 minutes', c: 'for 20 minutes', t: 'Grammar', x: 'Bei einer Zeitspanne steht for. since nur mit einem Zeitpunkt (since 9 a.m., since Monday).' },
+      e7: { w: 'controll', c: 'monitor', t: 'Vocabulary', x: 'controll ist falsch geschrieben – und control heißt „steuern“. Für das laufende Beobachten eines Messwerts passt monitor.' },
+      e8: { w: 'clean the liquid with paper', c: 'purify the liquid by vacuum filtration', t: 'Technical Term', x: '„Mit Papier reinigen“ ist zu ungenau. Das Laborverfahren mit Filterpapier und Unterdruck heißt vacuum filtration.' },
+      e9: { w: 'a lot of', c: 'a considerable amount of', t: 'Style', x: 'a lot of ist umgangssprachlich. Ein Technical Report verlangt ein formelles Register: a considerable amount of, numerous.' },
+      e10: { w: 'chemical amount', c: 'molar concentration', t: 'Technical Term', x: '„chemical amount“ ist kein Fachbegriff. Gemeint ist die Stoffmengenkonzentration – molar concentration (mol/L).' },
+      e11: { w: 'I think the results are pretty good', c: 'The results indicate a high degree of purity', t: 'Style', x: 'Technical Reports sind objektiv: keine Ich-Form, keine Wertungen wie pretty good. Lass die Daten sprechen.' }
+    },
+    summary: 'Dein Report ist klar gegliedert und die Methode gut nachvollziehbar. Größte Baustelle sind Fachbegriffe: An vier Stellen verwendest du Alltagssprache statt chemischer Terminologie.',
+    check: 'Introduction, Method und Results sind vorhanden. Es fehlt ein Abschnitt „Conclusion“. Schreib den Method-Teil durchgehend im Passiv (The mixture was heated …).',
+    tip: 'Bei Technical Reports zählt „Lexical Range“. Lerne zehn Laborverben: conduct, monitor, purify, dilute, titrate, heat, cool, filter, measure, record.'
+  },
+  ahs: {
+    title: 'Should Smartphones Be Banned in Schools?', short: 'Smartphones in Schools',
+    paras: [
+      { h: '', t: 'Nowadays almost every student [[a1]] a smartphone. [[a2]] this is both a chance and a problem.' },
+      { h: '', t: 'Many teachers say that phones [[a3]] the lessons. Students are [[a4]] check messages instead of listening, and some even use the phone to [[a5]] during class.' },
+      { h: '', t: '[[a6]], phones can be useful for research. If schools [[a7]] phones completely, students could not learn how to use this [[a8]] responsibly.' }
+    ],
+    errors: {
+      a1: { w: 'have', c: 'has', t: 'Grammar', x: 'every steht mit Singular: every student has. Das Verb bekommt das -s der 3. Person.' },
+      a2: { w: 'In my opinion I think', c: 'In my opinion,', t: 'Style', x: 'Doppelt gemoppelt: In my opinion und I think sagen dasselbe. Entscheide dich für eine Formulierung.' },
+      a3: { w: 'disturb', c: 'disrupt', t: 'Vocabulary', x: 'disturb heißt „belästigen“. Wenn der Unterricht unterbrochen wird, ist disrupt das präzisere Wort.' },
+      a4: { w: 'gonna', c: 'likely to', t: 'Style', x: 'gonna ist gesprochene Sprache und hat im Essay nichts verloren. Formell: are likely to / tend to.' },
+      a5: { w: 'make homeworks', c: 'do homework', t: 'Vocabulary', x: 'Hausübungen „macht“ man mit do – und homework ist unzählbar, also ohne -s.' },
+      a6: { w: 'On the other hand side', c: 'On the other hand', t: 'Vocabulary', x: 'Mischung aus „on the other hand“ und „auf der anderen Seite“. Die feste Wendung lautet On the other hand.' },
+      a7: { w: 'would ban', c: 'banned', t: 'Grammar', x: 'Im if-Satz (2nd conditional) steht kein would: If schools banned …, students could not …' },
+      a8: { w: 'stuff', c: 'technology', t: 'Style', x: 'stuff ist sehr umgangssprachlich. Nenne konkret, worum es geht: technology, these devices.' }
+    },
+    summary: 'Deine Argumentation ist ausgewogen, du nennst Pro und Contra. Achte auf feste Wendungen und vermeide gesprochene Sprache wie gonna oder stuff.',
+    check: 'Für ein Essay fehlen eine klare These in der Einleitung und eine Conclusion. Gliedere in Einleitung, zwei Hauptabsätze und Schluss.',
+    tip: 'Die Matura-Aufgabe nennt meist drei Inhaltspunkte. Hake sie vor der Abgabe einzeln ab – fehlende Punkte kosten im Kriterium „Task Achievement“.'
+  }
+};
+const BASE_HISTORY = [
+  { id: 12, title: 'Lab Report: Distillation', type: 'Technical Report', school: 'BHS', dept: 'Chemieingenieurwesen', date: 'Heute, 08:14', status: 'completed', key: 'bhs' },
+  { id: 11, title: 'Smartphones in Schools', type: 'Essay', school: 'BHS', dept: 'Chemieingenieurwesen', date: 'Mo, 12. Okt', status: 'completed', key: 'ahs' },
+  { id: 10, title: 'Internship Application', type: 'Formal Letter', school: 'BHS', dept: 'Chemieingenieurwesen', date: 'Fr, 9. Okt', status: 'processing' },
+  { id: 9, title: 'Executive Summary: Water Analysis', type: 'Executive Summary', school: 'BHS', dept: 'Chemieingenieurwesen', date: 'Di, 6. Okt', status: 'failed' }
+];
+const STATUS = {
+  completed: { l: 'Fertig', bg: '#CDEFE8', c: '#0E5E52', icon: '#123C69' },
+  processing: { l: 'Wird analysiert', bg: '#FCEBB8', c: '#7A5200', icon: '#F2B233' },
+  failed: { l: 'Fehlgeschlagen', bg: '#FAD4CC', c: '#9E2416', icon: '#E0412F' }
+};
+const STATS = { 'Technical Term': 17, 'Grammar': 14, 'Vocabulary': 9, 'Style': 6 };
+const STEPS = [
+  { label: 'Foto hochgeladen', sub: 'Bild sicher übertragen' },
+  { label: 'Handschrift erkennen', sub: 'Google Cloud Vision · OCR' },
+  { label: 'KI-Korrektur auf B2-Niveau', sub: 'GPT-4o · Matura-Kriterien' },
+  { label: 'Feedback speichern', sub: 'Korrekturen & Matura-Tipp' }
+];
+
+class Component extends DCLogic {
+  state = { screen: 'dashboard', w: window.innerWidth, school: 'BHS', department: 'Chemieingenieurwesen', textType: 'Technical Report',
+    previewUrl: null, fileName: '', demo: false, procStep: 0, procFailed: false, scanTop: '0%',
+    meta: BASE_HISTORY[0], selId: null, done: {}, off: {}, showCorrected: false, extra: [] };
+  scrollRef = React.createRef();
+
+  componentDidMount() {
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); this.stopProc(); }
+
+  go(screen, extra) {
+    if (screen !== 'processing') this.stopProc();
+    this.setState(Object.assign({ screen }, extra || {}));
+    const el = this.scrollRef.current; if (el) el.scrollTop = 0;
+  }
+  stopProc() { clearInterval(this.procT); clearInterval(this.scanT); clearTimeout(this.doneT); clearTimeout(this.kickT); }
+  start() {
+    this.stopProc();
+    const fail = !!this.props.simulateFail;
+    this.go('processing', { procStep: 1, procFailed: false, scanTop: '0%' });
+    this.kickT = setTimeout(() => this.setState({ scanTop: '96%' }), 60);
+    this.scanT = setInterval(() => this.setState(s => ({ scanTop: s.scanTop === '0%' ? '96%' : '0%' })), 1400);
+    this.procT = setInterval(() => {
+      const n = this.state.procStep + 1;
+      if (fail && n === 3) { this.stopProc(); this.setState({ procFailed: true }); return; }
+      if (n >= 4) { this.stopProc(); this.setState({ procStep: 4 }); this.doneT = setTimeout(() => this.finish(), 800); return; }
+      this.setState({ procStep: n });
+    }, 1500);
+  }
+  finish() {
+    const st = this.state;
+    const key = ESSAYISH.includes(st.textType) ? 'ahs' : 'bhs';
+    const scan = { id: 13 + st.extra.length, title: SAMPLES[key].short, type: st.textType, school: st.school,
+      dept: st.school === 'BHS' ? st.department : '', date: 'Gerade eben', status: 'completed', key };
+    this.setState({ extra: [scan].concat(st.extra), previewUrl: null, fileName: '', demo: false });
+    this.openScan(scan);
+  }
+  openScan(scan, extra) {
+    this.go('correction', Object.assign({ meta: scan, selId: null, done: {}, off: {}, showCorrected: false }, extra || {}));
+  }
+  practiceTech() {
+    const off = {}; ORDER.forEach(t => { if (t !== 'Technical Term') off[t] = true; });
+    const s = SAMPLES.bhs; const first = Object.keys(s.errors).find(k => s.errors[k].t === 'Technical Term');
+    this.openScan(BASE_HISTORY[0], { off, selId: first });
+  }
+  filterBy(type) {
+    const off = {}; ORDER.forEach(t => { if (t !== type) off[t] = true; });
+    const s = SAMPLES.bhs; const first = Object.keys(s.errors).find(k => s.errors[k].t === type) || null;
+    this.openScan(BASE_HISTORY[0], { off, selId: first });
+  }
+
+  renderVals() {
+    const st = this.state, p = this.props;
+    const device = p.device ?? 'auto';
+    const markStyle = p.markStyle ?? 'fill';
+    const mobile = device === 'smartphone' || (device === 'auto' && st.w < 760);
+    const framed = device === 'smartphone' && st.w >= 520;
+    const scr = st.screen;
+
+    const history = st.extra.concat(BASE_HISTORY).map(h => {
+      const S = STATUS[h.status];
+      const n = h.status === 'completed' ? Object.keys(SAMPLES[h.key].errors).length : 0;
+      return { num: '#' + h.id, title: h.title, iconBg: S.icon, sBg: S.bg, sColor: S.c, sLabel: S.l,
+        sub: h.type + (n ? ' · ' + n + ' Korrekturen' : '') + ' · ' + h.date,
+        cursor: h.status === 'processing' ? 'default' : 'pointer',
+        onClick: h.status === 'completed' ? () => this.openScan(h) : h.status === 'failed' ? () => this.go('setup') : undefined };
+    });
+
+    const totalStats = Object.values(STATS).reduce((a, b) => a + b, 0);
+    const stats = Object.keys(STATS).map((k, i) => Object.assign({}, T[k], { count: STATS[k], rank: i + 1,
+      pct: Math.round(STATS[k] / totalStats * 100) + '%', onClick: () => this.filterBy(k) }));
+    const cells = Array.from({ length: 20 }, (_, i) => ({ bg: i < 14 ? '#AC3B61' : i < 16 ? '#EDC7B7' : 'rgba(238,226,220,.18)' }));
+
+    const nav = [['dashboard', 'Dashboard'], ['setup', 'Neuer Scan'], ['history', 'Verlauf']];
+    const navActive = scr === 'processing' ? 'setup' : scr === 'correction' ? 'history' : scr;
+    const navItems = nav.map(([k, l]) => ({ label: l, line: navActive === k ? '#EDC7B7' : 'transparent', onClick: () => this.go(k) }));
+
+    const isBHS = st.school === 'BHS';
+    const textTypes = TYPES[st.school].map(t => ({ label: t, onClick: () => this.setState({ textType: t }),
+      bg: st.textType === t ? '#123C69' : '#fff', color: st.textType === t ? '#EEE2DC' : '#123C69' }));
+    const hasImage = !!st.previewUrl || st.demo;
+
+    const procSteps = STEPS.map((s, i) => {
+      const doneS = i < st.procStep, active = i === st.procStep, failed = st.procFailed && active;
+      return Object.assign({}, s, { mark: failed ? '!' : doneS ? '✓' : String(i + 1),
+        bg: failed ? '#E0412F' : doneS ? '#1E9E8B' : active ? '#F2B233' : '#EEE2DC',
+        color: failed || doneS ? '#fff' : '#123C69', opacity: doneS || active ? 1 : .5 });
+    });
+
+    const sample = SAMPLES[st.meta.key || 'bhs'];
+    const order = [];
+    const paras = sample.paras.map(pa => {
+      const parts = pa.t.split(/\[\[(\w+)\]\]/);
+      const segs = parts.map((part, i) => {
+        const plain = { text: part, bg: 'transparent', line: 'none', color: 'inherit', pad: '0', cursor: 'text', weight: 400, onClick: undefined };
+        if (i % 2 === 0) return plain;
+        const e = sample.errors[part]; order.push(part);
+        const ty = T[e.t]; const text = st.showCorrected ? e.c : e.w;
+        if (st.off[e.t]) return Object.assign(plain, { text });
+        const g = { text, pad: '2px 3px', cursor: 'pointer', weight: 600, color: '#123C69', onClick: () => this.setState({ selId: part }) };
+        if (st.selId === part) return Object.assign(g, { bg: ty.deep, color: '#fff', line: '3px solid ' + ty.base });
+        if (st.done[part]) return Object.assign(g, { bg: '#CDEFE8', line: '2px solid #1E9E8B', weight: 400 });
+        if (markStyle === 'underline') return Object.assign(g, { bg: 'transparent', line: '3px solid ' + ty.base });
+        return Object.assign(g, { bg: ty.tint, line: '2px solid ' + ty.base });
+      });
+      return { h: pa.h, hasH: !!pa.h, segs };
+    });
+    const visible = order.filter(id => !st.off[sample.errors[id].t]);
+    const counts = {}; order.forEach(id => { const t = sample.errors[id].t; counts[t] = (counts[t] || 0) + 1; });
+    const legend = ORDER.filter(t => counts[t]).map(t => Object.assign({}, T[t], { count: counts[t],
+      bg: st.off[t] ? 'transparent' : T[t].tint, strike: st.off[t] ? 'line-through' : 'none',
+      onClick: () => this.setState(s => { const off = Object.assign({}, s.off); off[t] = !off[t];
+        const selOff = s.selId && sample.errors[s.selId].t === t && off[t]; return { off, selId: selOff ? null : s.selId }; }) }));
+    const doneCount = order.filter(id => st.done[id]).length;
+
+    let sel = null;
+    if (st.selId && sample.errors[st.selId] && scr === 'correction') {
+      const e = sample.errors[st.selId]; const ty = T[e.t];
+      const idx = visible.indexOf(st.selId);
+      const step = d => { const n = visible.length; if (!n) return; this.setState({ selId: visible[((idx + d) % n + n) % n] }); };
+      const isDone = !!st.done[st.selId];
+      sel = Object.assign({}, ty, { wrong: e.w, correct: e.c, expl: e.x, pos: idx + 1, count: visible.length,
+        prev: () => step(-1), next: () => step(1), isDone,
+        doneLabel: isDone ? 'Verstanden · weiter' : 'Verstanden',
+        doneBg: isDone ? '#1E9E8B' : '#AC3B61',
+        markDone: () => this.setState(s => {
+          const done = Object.assign({}, s.done); done[s.selId] = true;
+          const rest = visible.slice(idx + 1).concat(visible.slice(0, idx)).find(id => !done[id]);
+          return { done, selId: rest || null };
+        }) });
+    }
+    const metaTags = [st.meta.school || 'BHS'].concat(st.meta.dept ? [st.meta.dept] : []).concat([st.meta.type]);
+
+    return {
+      deskBg: framed ? '#BAB2B5' : '#EEE2DC', deskPad: framed ? '32px 16px' : '0',
+      frameW: framed ? '390px' : '100%', frameH: framed ? '844px' : '100vh',
+      frameBorder: framed ? '10px solid #123C69' : '0', frameShadow: framed ? '0 24px 60px rgba(18,60,105,.35)' : 'none',
+      mobile, desktop: !mobile, scrollRef: this.scrollRef,
+      pad: mobile ? '20px 16px 32px' : '36px 40px 64px', cardPad: mobile ? '20px' : '32px',
+      heroSize: mobile ? '44px' : '68px', scoreSize: mobile ? '96px' : '128px', h1Size: mobile ? '30px' : '44px', h2Size: mobile ? '24px' : '30px',
+      isDash: scr === 'dashboard', isSetup: scr === 'setup', isProc: scr === 'processing', isCorr: scr === 'correction', isHist: scr === 'history',
+      navItems, tabDash: scr === 'dashboard' ? '#AC3B61' : '#123C69', tabHist: scr === 'history' || scr === 'correction' ? '#AC3B61' : '#123C69',
+      goDash: () => this.go('dashboard'), goSetup: () => this.go('setup'), goHist: () => this.go('history'),
+      practiceTech: () => this.practiceTech(),
+      cells, stats, recent: history.slice(0, 3), history,
+      school: st.school, isAHS: !isBHS, isBHS, department: st.department, departments: DEPTS,
+      isChem: isBHS && st.department === 'Chemieingenieurwesen',
+      ahsBg: isBHS ? '#fff' : '#123C69', ahsColor: isBHS ? '#123C69' : '#EEE2DC',
+      bhsBg: isBHS ? '#123C69' : '#fff', bhsColor: isBHS ? '#EEE2DC' : '#123C69',
+      pickAHS: () => this.setState({ school: 'AHS', textType: 'Essay' }),
+      pickBHS: () => this.setState({ school: 'BHS', textType: 'Technical Report' }),
+      onDept: e => this.setState({ department: e.target.value }),
+      textTypes, textType: st.textType,
+      noImage: !hasImage, hasImage, hasRealImg: !!st.previewUrl, demo: st.demo, demoOrNone: !st.previewUrl,
+      previewBg: st.previewUrl ? 'url(' + st.previewUrl + ')' : 'none', fileName: st.fileName,
+      uploadLabel: mobile ? 'Foto aufnehmen' : 'Foto hochladen',
+      onFile: e => { const f = e.target.files && e.target.files[0]; if (f) this.setState({ previewUrl: URL.createObjectURL(f), fileName: f.name, demo: false }); },
+      useDemo: () => this.setState({ demo: true, previewUrl: null, fileName: 'lab-report-seite1.jpg' }),
+      clearImage: () => this.setState({ demo: false, previewUrl: null, fileName: '' }),
+      cantSubmit: !hasImage, start: () => this.start(),
+      procSteps, procPct: Math.round(st.procStep / 4 * 100) + '%', procRunning: !st.procFailed, procFailed: st.procFailed,
+      procTitle: st.procStep >= 4 ? 'Fertig! Dein Feedback ist da.' : st.procStep >= 2 ? 'Die KI korrigiert deinen Text …' : 'LingoLens liest deine Handschrift …',
+      scanTop: st.scanTop, scanOpacity: st.procFailed || st.procStep >= 4 ? 0 : 1, procImgH: mobile ? '240px' : '440px',
+      nextId: 13 + st.extra.length,
+      meta: st.meta, metaTags, sample, paras, legend, total: order.length, doneCount,
+      donePct: (order.length ? Math.round(doneCount / order.length * 100) : 0) + '%',
+      viewMarked: !st.showCorrected, showCorrected: st.showCorrected,
+      showMarked: () => this.setState({ showCorrected: false }), showFixed: () => this.setState({ showCorrected: true }),
+      corrCols: mobile ? 'minmax(0,1fr)' : 'minmax(0,2fr) minmax(320px,1fr)', panelPos: mobile ? 'static' : 'sticky',
+      paperPad: mobile ? '20px 18px' : '36px 40px', textSize: mobile ? '16px' : '18px',
+      paperHint: mobile ? 'Tippe auf eine Markierung für Erklärung und B2-Äquivalent.' : 'Klicke auf eine Markierung für Erklärung und B2-Äquivalent.',
+      sel: sel || {}, deskSel: !mobile && !!sel, deskEmpty: !mobile && !sel, mobileSel: mobile && !!sel,
+      closeSel: () => this.setState({ selId: null }),
+      selectFirst: () => this.setState({ selId: visible[0] || null })
+    };
+  }
+}
+</script>
+</body>
+</html>
