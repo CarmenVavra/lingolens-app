@@ -26,7 +26,7 @@ netcup-Webhosting (Plesk) hat kein Node.js und keinen dauerhaft laufenden Queue-
 2. **Budget-Limit** setzen („Limits“), z. B. 10–20 USD/Monat.
 3. „API keys“ → neuen Key erstellen (nur einmal sichtbar – sicher aufbewahren).
 
-> ⚠️ OpenAI schaltet `gpt-4o` am **14.01.2027** ab – vor der Matura. Das Modell ist über `OPENAI_MODEL` in der `.env` umstellbar; vor dem Umstieg das neue Modell testen.
+> ⚠️ OpenAI schaltet `gpt-4o` am **14.01.2027** ab – vor der Matura. Das Modell ist über `OPENAI_MODEL` in der `.env` umstellbar; vor dem Umstieg das neue Modell testen. Neuere Modelle (GPT-5 und später, o-Serie) bekommen automatisch keine `temperature` mitgeschickt, weil sie diese Einstellung ablehnen – es ist also keine Code-Änderung nötig. Sie „denken“ vor der Antwort und brauchen daher etwas länger.
 
 ---
 

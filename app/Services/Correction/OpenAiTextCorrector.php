@@ -21,18 +21,23 @@ class OpenAiTextCorrector implements TextCorrector
 
     public function correct(Scan $scan, string $text): array
     {
+        $payload = [
+            'model' => $this->model,
+            'response_format' => ['type' => 'json_object'],
+            'messages' => [
+                ['role' => 'system', 'content' => $this->prompts->build($scan)],
+                ['role' => 'user', 'content' => $text],
+            ],
+        ];
+
+        if (self::supportsTemperature($this->model)) {
+            $payload['temperature'] = 0.2;
+        }
+
         $response = Http::withToken($this->apiKey)
             ->timeout(120)
             ->retry(2, 1000, throw: false)
-            ->post(self::ENDPOINT, [
-                'model' => $this->model,
-                'response_format' => ['type' => 'json_object'],
-                'temperature' => 0.2,
-                'messages' => [
-                    ['role' => 'system', 'content' => $this->prompts->build($scan)],
-                    ['role' => 'user', 'content' => $text],
-                ],
-            ])
+            ->post(self::ENDPOINT, $payload)
             ->throw();
 
         $data = json_decode((string) $response->json('choices.0.message.content'), true);
@@ -42,6 +47,16 @@ class OpenAiTextCorrector implements TextCorrector
         }
 
         return self::normalize($data);
+    }
+
+    /**
+     * Only the classic GPT-4 / GPT-3.5 models accept a custom temperature.
+     * Reasoning models (o-series, GPT-5 and later) reject the parameter with
+     * a 400 error, so OPENAI_MODEL can be switched without code changes.
+     */
+    public static function supportsTemperature(string $model): bool
+    {
+        return (bool) preg_match('/^(gpt-4|gpt-3\.5|chatgpt-4o)/i', trim($model));
     }
 
     /**
