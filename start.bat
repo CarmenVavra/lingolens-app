@@ -39,8 +39,11 @@ if not exist public\build\manifest.json (
     call npm run build
 )
 
+REM Eine bereits laufende LingoLens-Instanz zuerst beenden (sonst blockieren sich zwei Worker).
+call "%~dp0stop.bat" >nul
+
 echo [LingoLens] Starte Queue-Worker ...
-start "LingoLens Queue" /min php artisan queue:work --tries=1 --timeout=300
+start "LingoLens Queue" /min php artisan queue:work --name=lingolens --tries=1 --timeout=300
 
 echo [LingoLens] Starte Server auf http://localhost:%PORT% ...
 start "LingoLens Server" /min php artisan serve --host=%HOST% --port=%PORT%

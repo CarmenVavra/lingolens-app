@@ -36,6 +36,13 @@ class AnnotatedTextTest extends TestCase
         );
     }
 
+    public function test_straight_and_typographic_quotes_match(): void
+    {
+        $text = "Let\u{2019}s give it a try and \u{201E}test\u{201C} it.";
+
+        $this->assertSame([[0, 5], [24, 30]], AnnotatedText::locate($text, ["Let's", '"test"']));
+    }
+
     public function test_line_break_matching_never_spans_paragraphs(): void
     {
         $this->assertSame([null], AnnotatedText::locate("the end\n\nof story", ['end of']));

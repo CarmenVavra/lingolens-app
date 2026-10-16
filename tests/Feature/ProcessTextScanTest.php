@@ -73,7 +73,8 @@ class ProcessTextScanTest extends TestCase
         $this->assertSame('Distillation Report', $scan->title);
         $this->assertSame('Lerne Laborverben.', $scan->latestFeedback->matura_tip);
         $this->assertSame(ErrorType::Grammar, $scan->latestFeedback->corrections[0]->error_type);
-        $this->assertNull($scan->latestFeedback->corrections[2]->start_offset, 'Unknown passages stay unlocated.');
+        $this->assertCount(2, $scan->latestFeedback->corrections, 'Passages that are not in the text are dropped.');
+        $this->assertNotContains('not in the text', $scan->latestFeedback->corrections->pluck('wrong_text'));
 
         // Photos are deleted after processing.
         Storage::disk('local')->assertMissing($path);
@@ -85,7 +86,8 @@ class ProcessTextScanTest extends TestCase
             && $request->hasHeader('Authorization', 'Bearer test-openai-key')
             && $request['model'] === 'gpt-4o'
             && str_contains($request['messages'][0]['content'], 'Chemieingenieurwesen')
-            && str_contains($request['messages'][0]['content'], 'vacuum filtration'));
+            && str_contains($request['messages'][0]['content'], 'vacuum filtration')
+            && str_contains($request['messages'][0]['content'], 'erfinde keine Fehler'));
     }
 
     public function test_unreadable_handwriting_marks_the_scan_as_failed(): void

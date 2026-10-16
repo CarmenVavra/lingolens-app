@@ -38,7 +38,8 @@ return [
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-            'busy_timeout' => null,
+            // Web server and queue worker share the file: wait for a lock instead of failing.
+            'busy_timeout' => (int) env('DB_BUSY_TIMEOUT', 5000),
             'journal_mode' => null,
             'synchronous' => null,
             'transaction_mode' => 'DEFERRED',

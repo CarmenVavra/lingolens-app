@@ -36,7 +36,7 @@ class AnnotatedText
                 foreach ([$cursor, 0] as $from) {
                     $found = self::findFree($text, $needle, $from, $taken, false)
                         ?? self::findFree($text, $needle, $from, $taken, true)
-                        ?? self::findFreeAcrossLines($text, $needle, $from, $taken);
+                        ?? self::findFreeFuzzy($text, $needle, $from, $taken);
 
                     if ($found !== null) {
                         break;
@@ -215,21 +215,29 @@ class AnnotatedText
 
     /**
      * Fallback for passages the OCR split over two lines (handwriting line
-     * breaks) or that the AI quotes with different spacing: any whitespace in
-     * the passage may be spaces or a single line break, never a blank line.
+     * breaks) or that the AI quotes with different spacing or quote marks:
+     * any whitespace in the passage may be spaces or a single line break (never
+     * a blank line); straight and typographic quotes count as the same.
      *
      * @param  list<array{0: int, 1: int}>  $taken
      * @return array{0: int, 1: int}|null
      */
-    private static function findFreeAcrossLines(string $haystack, string $needle, int $from, array $taken): ?array
+    private static function findFreeFuzzy(string $haystack, string $needle, int $from, array $taken): ?array
     {
         $words = preg_split('/\s+/u', $needle, -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
-        if (count($words) < 2) {
+        if ($words === []) {
             return null;
         }
 
-        $pattern = '/'.implode('(?:[ \t]*\r?\n[ \t]*|[ \t]+)', array_map(fn (string $word) => preg_quote($word, '/'), $words)).'/iu';
+        $single = "['\u{2019}\u{2018}]";
+        $double = "[\"\u{201C}\u{201D}\u{201E}]";
+        $quotes = [
+            "'" => $single, "\u{2019}" => $single, "\u{2018}" => $single,
+            '"' => $double, "\u{201C}" => $double, "\u{201D}" => $double, "\u{201E}" => $double,
+        ];
+        $words = array_map(fn (string $word) => strtr(preg_quote($word, '/'), $quotes), $words);
+        $pattern = '/'.implode('(?:[ \t]*\r?\n[ \t]*|[ \t]+)', $words).'/iu';
         $byteOffset = strlen(mb_substr($haystack, 0, $from));
 
         while (preg_match($pattern, $haystack, $match, PREG_OFFSET_CAPTURE, $byteOffset) === 1) {

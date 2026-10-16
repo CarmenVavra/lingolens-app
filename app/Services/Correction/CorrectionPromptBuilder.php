@@ -27,13 +27,18 @@ class CorrectionPromptBuilder
                 ->map(fn (string $correct, string $wrong) => "'{$wrong}' → '{$correct}'")
                 ->implode(', ');
 
-            $prompt .= ' Achte strikt darauf, dass Alltagssprache durch chemische Fachbegriffe ersetzt wird'
-                ." (z.B. {$examples}). Markiere dies als 'Technical Term'.";
+            $prompt .= ' Wo der Schüler Alltagssprache statt eines chemischen Fachbegriffs verwendet, ersetze sie durch den Fachbegriff'
+                ." und markiere dies als 'Technical Term'. Beispiele für solche Ersetzungen (nur zur Orientierung –"
+                ." korrigiere sie nur, wenn sie wirklich im Text stehen): {$examples}.";
         }
 
         $types = collect(ErrorType::cases())->map(fn (ErrorType $type) => "'{$type->value}'")->implode(', ');
 
         return $prompt
+            .' Der Text stammt oft aus einer Handschrift-Erkennung: Ignoriere aufgedruckte Fremdtexte (z.B. Überschriften'
+            .' eines Notizblocks) und einzelne verstreute Wörter, die offensichtlich nicht zum Schülertext gehören.'
+            .' Korrigiere ausschließlich Fehler, die tatsächlich im Text vorkommen – erfinde keine Fehler und übernimm'
+            .' keine Beispiele. Hat der Text wenige Fehler, gib nur wenige Korrekturen zurück.'
             .' Antworte didaktisch auf Deutsch als valides JSON mit den Keys:'
             ." 'title' (kurzer englischer Titel des Textes, max. 60 Zeichen),"
             ." 'summary' (2 Sätze Gesamteindruck),"

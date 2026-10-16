@@ -30,13 +30,19 @@ class StoreScanFeedback
             ]);
 
             foreach ($result['corrections'] as $index => $correction) {
+                // Passages that do not occur in the text are AI hallucinations
+                // (e.g. copied prompt examples) – they cannot be marked, so skip them.
+                if ($offsets[$index] === null) {
+                    continue;
+                }
+
                 $feedback->corrections()->create([
                     'wrong_text' => $correction['original'],
                     'correct_text' => $correction['corrected'],
                     'error_type' => ErrorType::fromAi($correction['type']),
                     'explanation' => $correction['explanation'],
-                    'start_offset' => $offsets[$index][0] ?? null,
-                    'end_offset' => $offsets[$index][1] ?? null,
+                    'start_offset' => $offsets[$index][0],
+                    'end_offset' => $offsets[$index][1],
                 ]);
             }
 
