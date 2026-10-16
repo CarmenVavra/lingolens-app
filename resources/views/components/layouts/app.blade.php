@@ -30,10 +30,10 @@
         </nav>
         <div class="user-chip">
             <span class="avatar" aria-hidden="true">{{ $user->initials() }}</span>
-            <span class="user-chip__text">
+            <a href="{{ route('account.show') }}" class="user-chip__text" title="Mein Konto">
                 <span class="user-chip__name">{{ $user->name }}</span>
                 <span class="user-chip__meta">{{ $user->chipLabel() }}</span>
-            </span>
+            </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="btn btn-icon logout-btn" aria-label="Abmelden" title="Abmelden">
@@ -50,6 +50,7 @@
             <div class="account-menu">
                 <span style="font-weight:600">{{ $user->name }}</span>
                 <span style="font-size:13px;color:var(--color-muted)">{{ $user->chipLabel() }}</span>
+                <a href="{{ route('account.show') }}" class="btn btn-secondary" style="width:100%;justify-content:flex-start;min-height:44px">Konto &amp; Passwort</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:flex-start;min-height:44px">

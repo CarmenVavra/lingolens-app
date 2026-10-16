@@ -85,6 +85,7 @@ Im Ordner `lingolens`: `.env.production.example` kopieren → umbenennen in **`.
 - `APP_KEY=` den Schlüssel aus Schritt 2 eintragen (inkl. `base64:`)
 - `GOOGLE_VISION_API_KEY=` und `OPENAI_API_KEY=` eintragen
 - **`LEGAL_NAME`, `LEGAL_STREET`, `LEGAL_CITY`, `LEGAL_EMAIL`** ausfüllen – erscheinen in Impressum und Datenschutzerklärung (solange sie fehlen, zeigen die Seiten rote Hinweise)
+- **E-Mail für „Passwort vergessen“:** in Plesk ein Postfach anlegen (z. B. `noreply@caryssa.at`) und `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD` eintragen (SMTP-Server siehe Plesk → E-Mail-Einstellungen bzw. netcup CCP)
 - optional `LINGOLENS_REGISTRATION_CODE=` setzen, damit sich nur deine Klasse registrieren kann
 - `LINGOLENS_DAILY_SCAN_LIMIT=` (Standard 20 Texte pro Schüler und Tag)
 
@@ -106,6 +107,7 @@ Im Ordner `lingolens`: `.env.production.example` kopieren → umbenennen in **`.
 1. https://lingolens.caryssa.at öffnen → registrieren.
 2. „Neuer Scan“ → **Beispieltext verwenden** → Analyse muss in unter einer Minute fertig sein.
 3. Ein echtes PDF und ein Foto hochladen.
+4. Abmelden → „Passwort vergessen?“ → kommt die E-Mail an? Unter „Mein Konto“ das Passwort ändern.
 
 Fehler stehen in `lingolens/storage/logs/laravel-JJJJ-MM-TT.log`.
 
@@ -131,6 +133,5 @@ Fehler stehen in `lingolens/storage/logs/laravel-JJJJ-MM-TT.log`.
 
 ## 6. Vor dem Go-live sonst noch offen
 
-- **Passwort vergessen:** noch nicht eingebaut – braucht ein E-Mail-Postfach (SMTP bei netcup).
 - **Konto selbst löschen:** derzeit per E-Mail-Anfrage (so in der Datenschutzerklärung beschrieben).
 - **Keine Demo-Daten** auf dem Server (`db:seed` nicht ausführen).

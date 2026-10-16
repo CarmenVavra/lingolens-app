@@ -72,8 +72,8 @@
         <dl class="legal__facts legal__facts--wide">
             <dt>Bereitstellung der Lernplattform</dt>
             <dd>
-                Konto, Texterkennung, KI-Korrektur, Verlauf und Statistiken – zur Erfüllung des Nutzungsverhältnisses
-                (Art. 6 Abs. 1 lit. b DSGVO).
+                Konto, Texterkennung, KI-Korrektur, Verlauf und Statistiken sowie – nur auf deine Anfrage – eine E-Mail mit
+                einem Link zum Zurücksetzen des Passworts; zur Erfüllung des Nutzungsverhältnisses (Art. 6 Abs. 1 lit. b DSGVO).
             </dd>
             <dt>Sicherheit und Missbrauchsschutz</dt>
             <dd>
@@ -132,6 +132,7 @@
             <li><strong>Erkannter Text, Korrekturen und Statistiken:</strong> solange dein Konto besteht, damit du deinen Verlauf und Fortschritt sehen kannst.</li>
             <li><strong>Konto:</strong> bis du die Löschung verlangst. Mit dem Konto werden alle deine Texte und Korrekturen gelöscht.</li>
             <li><strong>Protokolldateien:</strong> höchstens {{ $logDays }} Tage.</li>
+            <li><strong>Links zum Zurücksetzen des Passworts:</strong> sind 60 Minuten gültig und werden danach ungültig.</li>
             <li><strong>Sitzungsdaten:</strong> verfallen nach {{ $sessionHours }} Stunden Inaktivität bzw. beim Abmelden.</li>
         </ul>
     </section>

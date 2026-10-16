@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SchoolType;
+use App\Notifications\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -83,6 +84,16 @@ class User extends Authenticatable
     public function scans(): HasMany
     {
         return $this->hasMany(Scan::class);
+    }
+
+    /**
+     * German e-mail with the reset link.
+     *
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     public function firstName(): string

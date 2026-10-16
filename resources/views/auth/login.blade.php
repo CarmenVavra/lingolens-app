@@ -4,6 +4,10 @@
         <h1 class="page-title">Anmelden</h1>
     </div>
 
+    @if (session('status'))
+        <div class="flash" role="status">{{ session('status') }}</div>
+    @endif
+
     <form method="POST" action="{{ route('login') }}" novalidate>
         @csrf
 
@@ -25,10 +29,13 @@
             @enderror
         </div>
 
-        <label class="checkbox">
-            <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
-            Angemeldet bleiben
-        </label>
+        <div class="login-options">
+            <label class="checkbox">
+                <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
+                Angemeldet bleiben
+            </label>
+            <a href="{{ route('password.request') }}" class="login-options__link">Passwort vergessen?</a>
+        </div>
 
         <button type="submit" class="btn btn-primary btn-block">
             <span class="btn-label">Anmelden</span>
