@@ -53,8 +53,34 @@ class DocumentProcessingTest extends TestCase
             && str_contains($request['messages'][1]['content'], 'every student have a smartphone'));
     }
 
+    public function test_scanned_pdfs_without_text_layer_are_read_by_openai(): void
+    {
+        Http::fake(function (Request $request) {
+            $isOcr = is_array($request['messages'][1]['content']);
+
+            return Http::response(['choices' => [['message' => ['content' => $isOcr ? self::ESSAY : json_encode([
+                'title' => 'Smartphones', 'summary' => 'Gut.', 'textsorten_check' => 'Passt.', 'matura_tipp' => 'Weiter so.',
+                'corrections' => [['original' => 'student have', 'corrected' => 'student has', 'type' => 'Grammar', 'explanation' => 'Singular.']],
+            ])]]]]);
+        });
+        $scan = $this->scanWithFile(ScanSource::Pdf, DocumentFixtures::scannedPdf());
+
+        ProcessTextScan::dispatchSync($scan);
+
+        $scan->refresh();
+        $this->assertSame(ScanStatus::Completed, $scan->status);
+        $this->assertSame('ocr', $scan->extraction_method);
+        $this->assertSame(self::ESSAY, $scan->raw_extracted_text);
+
+        Http::assertSent(fn (Request $request) => is_array($request['messages'][1]['content'])
+            && $request['messages'][1]['content'][0]['type'] === 'file'
+            && str_starts_with($request['messages'][1]['content'][0]['file']['file_data'], 'data:application/pdf;base64,'));
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'googleapis.com'));
+    }
+
     public function test_scanned_pdfs_without_text_layer_are_read_by_google_vision(): void
     {
+        config(['lingolens.ocr_provider' => 'google']);
         $this->fakeApis(visionPdfPages: ['Nowadays almost every student have a smartphone.', 'In my opinion I think this is both a chance and a problem.']);
         $scan = $this->scanWithFile(ScanSource::Pdf, DocumentFixtures::scannedPdf());
 

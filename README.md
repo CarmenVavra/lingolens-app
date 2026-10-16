@@ -22,15 +22,15 @@ composer require laravel/boost --dev
 
 Laravel 12 · Blade · Tailwind CSS 4 · Alpine.js · SQLite · Queue (database)
 
-Schüler:innen fotografieren handgeschriebene englische Texte. Google Cloud Vision liest die Handschrift (OCR), GPT-4o korrigiert auf B2-Matura-Niveau, die App zeigt interaktives, farbcodiertes Feedback. Umsetzung nach `UI_Mockups/design_handoff_lingolens_ai`, `lingolens-blueprint.md` und `lingolens-konzept.pdf`. Responsiv für Laptop und Smartphone (Breakpoint 760 px).
+Schüler:innen fotografieren handgeschriebene englische Texte. Eine KI (OpenAI GPT-4o, alternativ Google Cloud Vision) liest die Handschrift, GPT-4o korrigiert auf B2-Matura-Niveau, die App zeigt interaktives, farbcodiertes Feedback. Umsetzung nach `UI_Mockups/design_handoff_lingolens_ai`, `lingolens-blueprint.md` und `lingolens-konzept.pdf`. Responsiv für Laptop und Smartphone (Breakpoint 760 px).
 
 ## Texte einreichen
 
 | Format | Verarbeitung |
 |---|---|
-| Foto (JPG, PNG, HEIC) | Handschrift-Erkennung (Google Cloud Vision) |
+| Foto (JPG, PNG; HEIC nur mit Google) | Handschrift-Erkennung (OpenAI, per `LINGOLENS_OCR_PROVIDER=google` Google Cloud Vision) |
 | PDF, am Laptop geschrieben | Textebene wird direkt ausgelesen – keine OCR nötig |
-| PDF, gescannt / handschriftlich | Handschrift-Erkennung der PDF-Seiten (Google Vision, erste 5 Seiten) |
+| PDF, gescannt / handschriftlich | Handschrift-Erkennung der PDF-Seiten (OpenAI bzw. Google Vision, erste 5 Seiten) |
 | Word (.docx), TXT | Text wird direkt übernommen |
 
 Max. 10 MB pro Datei, max. ca. 2.000 Wörter. Ob ein PDF getippt oder gescannt ist, erkennt LingoLens automatisch. Hochgeladene Dateien werden nach der Analyse gelöscht.
@@ -47,11 +47,13 @@ Demo-Login: siehe `database/seeders/DatabaseSeeder.php`.
 In `.env` eintragen:
 
 ```env
-GOOGLE_VISION_API_KEY=...
 OPENAI_API_KEY=...
+# optional: Google Cloud Vision statt OpenAI für die Handschrift
+# LINGOLENS_OCR_PROVIDER=google
+# GOOGLE_VISION_API_KEY=...
 ```
 
-Ohne Keys läuft die App im **Demo-Modus**: OCR und KI-Korrektur werden durch die Beispieltexte aus dem Design-Handoff ersetzt (`LINGOLENS_DEMO_MODE=true|false` erzwingt einen Modus).
+Ohne Key läuft die App im **Demo-Modus**: OCR und KI-Korrektur werden durch die Beispieltexte aus dem Design-Handoff ersetzt (`LINGOLENS_DEMO_MODE=true|false` erzwingt einen Modus).
 
 ## Screens & Routen
 

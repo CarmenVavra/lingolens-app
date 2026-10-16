@@ -68,8 +68,10 @@ class LegalPagesTest extends TestCase
             ->assertSee('Datenschutzerklärung')
             ->assertSee('Maria Muster')
             ->assertSee('netcup GmbH')
-            ->assertSee('Google Cloud EMEA Limited')
-            ->assertSee('ausschließlich in der Europäischen Union')
+            ->assertSee('Texterkennung und KI-Korrektur (OpenAI)')
+            ->assertSee('Fotos und gescannte PDFs werden an OpenAI übermittelt')
+            ->assertSee('auch deine Fotos')
+            ->assertDontSee('Google Cloud EMEA Limited')
             ->assertSee('OpenAI Ireland Ltd.')
             ->assertSee('Standardvertragsklauseln')
             ->assertSee('sofort nach der Analyse gelöscht')
@@ -78,9 +80,21 @@ class LegalPagesTest extends TestCase
             ->assertSee('Art. 15 DSGVO');
     }
 
+    public function test_privacy_policy_names_google_when_it_reads_the_photos(): void
+    {
+        config(['lingolens.ocr_provider' => 'google']);
+
+        $this->get(route('legal.privacy'))
+            ->assertSee('Texterkennung (Google Cloud Vision)')
+            ->assertSee('Google Cloud EMEA Limited')
+            ->assertSee('ausschließlich in der Europäischen Union')
+            ->assertSee('KI-Korrektur (OpenAI)')
+            ->assertDontSee('auch deine Fotos');
+    }
+
     public function test_privacy_policy_mentions_non_eu_processing_without_the_eu_endpoint(): void
     {
-        config(['services.google.vision_endpoint' => 'https://vision.googleapis.com']);
+        config(['lingolens.ocr_provider' => 'google', 'services.google.vision_endpoint' => 'https://vision.googleapis.com']);
 
         $this->get(route('legal.privacy'))
             ->assertDontSee('ausschließlich in der Europäischen Union')
@@ -113,7 +127,7 @@ class LegalPagesTest extends TestCase
 
     public function test_google_vision_uses_the_eu_endpoint_by_default(): void
     {
-        config(['services.google.vision_key' => 'k', 'services.openai.key' => 'k']);
+        config(['lingolens.ocr_provider' => 'google', 'services.google.vision_key' => 'k', 'services.openai.key' => 'k']);
         Storage::fake('local');
         Http::fake(['*' => Http::response(['responses' => [['fullTextAnnotation' => ['text' => '']]]])]);
 

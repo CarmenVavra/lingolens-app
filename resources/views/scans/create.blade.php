@@ -7,6 +7,7 @@
             'textTypes' => $textTypes,
             'chemistry' => config('lingolens.chemistry_department'),
             'extensions' => $extensions,
+            'photoFormats' => $photoFormats,
             'maxBytes' => config('lingolens.max_upload_kb') * 1024,
         ]))">
         <a href="{{ route('dashboard') }}" class="btn btn-ghost btn-back">
@@ -142,7 +143,7 @@
                                     <span class="format-tag">TXT</span>
                                 </span>
                                 <span id="file-hint" class="dropzone__hint">
-                                    PDF, JPG, PNG, HEIC, Word (.docx) oder TXT · max. 10 MB.
+                                    PDF, {{ $photoFormats }}, Word (.docx) oder TXT · max. 10 MB.
                                     Getippte PDFs werden direkt ausgelesen, Scans und Fotos per Handschrift-Erkennung.
                                 </span>
                             </label>

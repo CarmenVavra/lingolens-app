@@ -20,6 +20,11 @@ return [
 
     'openai_model' => env('OPENAI_MODEL', 'gpt-4o'),
 
+    // Handwriting recognition for photos and scanned PDFs:
+    // "openai" (vision model, reads cursive well) or "google" (Cloud Vision, EU endpoint).
+    'ocr_provider' => env('LINGOLENS_OCR_PROVIDER', 'openai'),
+    'ocr_model' => env('OPENAI_OCR_MODEL', 'gpt-4o'),
+
     // Run the analysis directly after the upload response instead of waiting for
     // the queue (useful on shared hosting with PHP-FPM; the cron stays as fallback).
     'process_after_response' => (bool) env('LINGOLENS_PROCESS_AFTER_RESPONSE', false),

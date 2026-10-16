@@ -8,6 +8,7 @@ use App\Services\Correction\DemoTextCorrector;
 use App\Services\Correction\OpenAiTextCorrector;
 use App\Services\Correction\TextCorrector;
 use App\Services\Ocr\GoogleVisionTextRecognizer;
+use App\Services\Ocr\OpenAiTextRecognizer;
 use App\Services\Ocr\TextRecognizer;
 use App\Support\LingoLens;
 use Illuminate\Database\Eloquent\Model;
@@ -24,10 +25,16 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // OCR is only called outside demo mode (the job uses sample texts there).
-        $this->app->bind(TextRecognizer::class, fn () => new GoogleVisionTextRecognizer(
-            (string) config('services.google.vision_key'),
-            (string) config('services.google.vision_endpoint'),
-        ));
+        // LINGOLENS_OCR_PROVIDER switches between OpenAI (default) and Google Cloud Vision.
+        $this->app->bind(TextRecognizer::class, fn () => LingoLens::ocrProvider() === 'google'
+            ? new GoogleVisionTextRecognizer(
+                (string) config('services.google.vision_key'),
+                (string) config('services.google.vision_endpoint'),
+            )
+            : new OpenAiTextRecognizer(
+                (string) config('services.openai.key'),
+                (string) config('lingolens.ocr_model'),
+            ));
 
         // Real AI correction when keys are configured, sample feedback in demo mode.
         $this->app->bind(TextCorrector::class, fn ($app) => LingoLens::demoMode()

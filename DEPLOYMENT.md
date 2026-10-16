@@ -11,7 +11,9 @@ netcup-Webhosting (Plesk) hat kein Node.js und keinen dauerhaft laufenden Queue-
 
 ## 1. API-Keys besorgen (ohne Keys läuft nur der Demo-Modus)
 
-**Google Cloud Vision** (Handschrift-Erkennung, erste 1.000 Seiten/Monat gratis, danach ca. 1,50 USD pro 1.000)
+Standardmäßig erledigt **OpenAI** beides: Handschrift-Erkennung der Fotos und KI-Korrektur (`LINGOLENS_OCR_PROVIDER=openai`). Dafür reicht der OpenAI-Key.
+
+**Google Cloud Vision** – nur nötig mit `LINGOLENS_OCR_PROVIDER=google` (erste 1.000 Seiten/Monat gratis, danach ca. 1,50 USD pro 1.000). Liest Druckschrift gut, Schreibschrift deutlich schlechter als OpenAI, verarbeitet aber nur in der EU.
 
 1. https://console.cloud.google.com → neues Projekt anlegen, z. B. „LingoLens“.
 2. Abrechnung (Billing) für das Projekt aktivieren.
@@ -20,7 +22,7 @@ netcup-Webhosting (Plesk) hat kein Node.js und keinen dauerhaft laufenden Queue-
 5. Schlüssel bearbeiten → **API-Einschränkungen: nur „Cloud Vision API“**.
 6. Optional: Budget-Benachrichtigung unter „Abrechnung → Budgets“ anlegen.
 
-**OpenAI** (KI-Korrektur)
+**OpenAI** (Handschrift-Erkennung und KI-Korrektur, ca. 0,4 Cent pro Foto plus ca. 2,5 Cent pro Korrektur mit gpt-4o)
 
 1. https://platform.openai.com → Konto, unter „Billing“ Guthaben aufladen.
 2. **Budget-Limit** setzen („Limits“), z. B. 10–20 USD/Monat.
@@ -83,7 +85,7 @@ Benötigte Erweiterungen (bei netcup Standard): `pdo_sqlite` (bzw. `pdo_mysql`),
 Im Ordner `lingolens`: `.env.production.example` kopieren → umbenennen in **`.env`** → bearbeiten:
 
 - `APP_KEY=` den Schlüssel aus Schritt 2 eintragen (inkl. `base64:`)
-- `GOOGLE_VISION_API_KEY=` und `OPENAI_API_KEY=` eintragen
+- `OPENAI_API_KEY=` eintragen (`GOOGLE_VISION_API_KEY=` nur bei `LINGOLENS_OCR_PROVIDER=google`)
 - **`LEGAL_NAME`, `LEGAL_STREET`, `LEGAL_CITY`, `LEGAL_EMAIL`** ausfüllen – erscheinen in Impressum und Datenschutzerklärung (solange sie fehlen, zeigen die Seiten rote Hinweise)
 - **E-Mail für Einladungen und „Passwort vergessen“:** `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD` und `MAIL_FROM_ADDRESS` eintragen. Benutzername und Absender müssen dasselbe **bestehende Postfach** sein (z. B. `admin@caryssa.at`), sonst lehnt netcup den Versand ab. Port 465 mit `MAIL_SCHEME=smtps`; Port 2525 funktioniert bei netcup nicht. Wer `noreply@caryssa.at` als Absender möchte, legt dafür in Plesk ein eigenes Postfach an.
 - **`LINGOLENS_ADMIN_EMAIL=admin@caryssa.at`** – das Admin-Konto. Eine Selbstregistrierung gibt es nicht; nur der Admin legt Schüler:innen an.
@@ -131,7 +133,8 @@ Fehler stehen in `lingolens/storage/logs/laravel-JJJJ-MM-TT.log`.
 - Beim Annehmen der Einladung muss die Datenschutzerklärung bestätigt werden (inkl. Mindestalter 14); der Zeitpunkt wird gespeichert.
 - Löschen auf Anfrage (Art. 17 DSGVO): **Schüler:innen** → „Löschen“ entfernt das Konto mit allen Texten und Korrekturen.
 - Keine Drittanbieter beim Seitenaufruf: Die Schrift wird lokal ausgeliefert, kein Tracking, nur technisch notwendige Cookies.
-- Google Vision läuft über den **EU-Endpunkt** (`eu-vision.googleapis.com`) – Fotos werden nur in der EU verarbeitet.
+- Fotos und gescannte PDFs liest standardmäßig **OpenAI** (kann auch in den USA verarbeiten, abgesichert durch Standardvertragsklauseln). Die Datenschutzerklärung passt sich an `LINGOLENS_OCR_PROVIDER` automatisch an.
+- Mit `LINGOLENS_OCR_PROVIDER=google` läuft Google Vision über den **EU-Endpunkt** (`eu-vision.googleapis.com`) – Fotos werden dann nur in der EU verarbeitet.
 - Die Texte sind eine sorgfältige Vorlage, aber **keine Rechtsberatung**. Bitte vor dem Go-live prüfen lassen, insbesondere: Vertragspartner bei Google Cloud und OpenAI (laut deren Auftragsverarbeitungsverträgen), Speicherdauer und ob ein gewerblicher Betrieb vorliegt.
 - Mit Google Cloud und OpenAI die jeweiligen **Auftragsverarbeitungsverträge (DPA)** in deren Konsolen akzeptieren.
 

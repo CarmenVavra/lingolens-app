@@ -157,7 +157,7 @@ class ScanUploadTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('scans.store'), $base + ['file' => new UploadedFile($path, 'essay.pdf', null, null, true)])
-            ->assertSessionHasErrors(['file' => 'Erlaubt sind PDF, Fotos (JPG, PNG, HEIC), Word (.docx) und TXT.']);
+            ->assertSessionHasErrors(['file' => 'Erlaubt sind PDF, Fotos (JPG, PNG), Word (.docx) und TXT.']);
 
         $this->actingAs($user)
             ->post(route('scans.store'), $base + ['file' => UploadedFile::fake()->create('slides.pptx', 100, 'application/vnd.openxmlformats-officedocument.presentationml.presentation')])
@@ -185,7 +185,18 @@ class ScanUploadTest extends TestCase
             ->assertOk()
             ->assertSee('Foto aufnehmen')
             ->assertSee('Datei hochladen oder hierher ziehen')
-            ->assertSee('accept=".jpg,.jpeg,.png,.heic,.heif,.pdf,.docx,.txt,application/pdf', false)
+            ->assertSee('accept=".jpg,.jpeg,.png,.pdf,.docx,.txt,application/pdf', false)
+            ->assertSee('PDF, JPG, PNG, Word (.docx) oder TXT')
             ->assertSee('Demo-Modus:');
+    }
+
+    public function test_heic_photos_are_only_offered_with_google_vision(): void
+    {
+        config(['lingolens.ocr_provider' => 'google']);
+
+        $this->actingAs(User::factory()->create())
+            ->get(route('scans.create'))
+            ->assertSee('accept=".jpg,.jpeg,.png,.heic,.heif,.pdf,.docx,.txt,application/pdf', false)
+            ->assertSee('PDF, JPG, PNG, HEIC, Word (.docx) oder TXT');
     }
 }

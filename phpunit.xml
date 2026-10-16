@@ -37,5 +37,8 @@
         <env name="LINGOLENS_DEMO_MODE" value=""/>
         <env name="LINGOLENS_DEMO_STEP_DELAY_MS" value="0"/>
         <env name="LINGOLENS_ADMIN_EMAIL" value=""/>
+        <env name="LINGOLENS_OCR_PROVIDER" value="openai"/>
+        <env name="OPENAI_MODEL" value="gpt-4o"/>
+        <env name="OPENAI_OCR_MODEL" value="gpt-4o"/>
     </php>
 </phpunit>

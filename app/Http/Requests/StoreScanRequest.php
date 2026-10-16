@@ -77,7 +77,7 @@ class StoreScanRequest extends FormRequest
     {
         return [
             'file.required_unless' => 'Bitte fotografiere deinen Text oder lade eine Datei hoch.',
-            'file.mimes' => 'Erlaubt sind PDF, Fotos (JPG, PNG, HEIC), Word (.docx) und TXT.',
+            'file.mimes' => 'Erlaubt sind PDF, Fotos ('.ScanSource::photoFormatsLabel().'), Word (.docx) und TXT.',
             'file.max' => 'Die Datei darf höchstens 10 MB groß sein.',
             'text_type.in' => 'Diese Textsorte passt nicht zum gewählten Schultyp.',
         ];

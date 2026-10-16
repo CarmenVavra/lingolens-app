@@ -7,6 +7,7 @@ use App\Enums\ScanStatus;
 use App\Jobs\ProcessTextScan;
 use App\Models\Scan;
 use App\Models\User;
+use App\Support\LingoLens;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\UploadedFile;
@@ -39,9 +40,60 @@ class ProcessTextScanTest extends TestCase
         );
     }
 
+    public function test_photos_are_transcribed_and_corrected_by_openai(): void
+    {
+        config(['services.openai.key' => 'test-openai-key', 'services.google.vision_key' => null]);
+        Storage::fake('local');
+
+        $handwriting = "Dear Agony Aunt\n\nI have a proplem with my parents!\nI have two younger brothers.";
+        Http::fake(function (Request $request) use ($handwriting) {
+            $isOcr = is_array($request['messages'][1]['content']);
+
+            return Http::response(['choices' => [['message' => ['content' => $isOcr
+                ? "```\n{$handwriting}\n```"
+                : json_encode([
+                    'title' => 'Letter to an Agony Aunt',
+                    'summary' => 'Gut.',
+                    'textsorten_check' => 'Anrede passt.',
+                    'matura_tipp' => 'Achte auf Rechtschreibung.',
+                    'corrections' => [['original' => 'proplem', 'corrected' => 'problem', 'type' => 'Vocabulary', 'explanation' => 'Schreibweise.']],
+                ])]]]]);
+        });
+
+        $path = UploadedFile::fake()->image('letter.jpg')->store('scans/1', 'local');
+        $scan = Scan::factory()->create(['uses_sample' => false, 'file_path' => $path, 'text_type' => 'Email']);
+
+        ProcessTextScan::dispatchSync($scan);
+
+        $scan->refresh()->load('latestFeedback.corrections');
+        $this->assertSame(ScanStatus::Completed, $scan->status);
+        $this->assertSame('ocr', $scan->extraction_method);
+        $this->assertSame($handwriting, $scan->raw_extracted_text, 'Code fences around the transcription are removed.');
+        $this->assertSame('proplem', $scan->latestFeedback->corrections->first()->wrong_text);
+        $this->assertNotNull($scan->latestFeedback->corrections->first()->start_offset);
+
+        Http::assertSentCount(2);
+        Http::assertSent(fn (Request $request) => is_array($request['messages'][1]['content'])
+            && $request['model'] === 'gpt-4o'
+            && $request['temperature'] === 0
+            && str_starts_with($request['messages'][1]['content'][0]['image_url']['url'], 'data:image/jpeg;base64,')
+            && str_contains($request['messages'][0]['content'], 'Korrigiere NICHTS'));
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'googleapis.com'));
+    }
+
+    public function test_openai_mode_does_not_need_a_google_key(): void
+    {
+        config(['services.openai.key' => 'k', 'services.google.vision_key' => null, 'lingolens.demo_mode' => null]);
+        $this->assertFalse(LingoLens::demoMode());
+
+        config(['lingolens.ocr_provider' => 'google']);
+        $this->assertTrue(LingoLens::demoMode(), 'Google OCR needs its own key.');
+    }
+
     public function test_real_mode_calls_google_vision_and_openai(): void
     {
         config([
+            'lingolens.ocr_provider' => 'google',
             'services.google.vision_key' => 'test-vision-key',
             'services.openai.key' => 'test-openai-key',
         ]);
@@ -92,7 +144,7 @@ class ProcessTextScanTest extends TestCase
 
     public function test_unreadable_handwriting_marks_the_scan_as_failed(): void
     {
-        config(['services.google.vision_key' => 'k', 'services.openai.key' => 'k']);
+        config(['lingolens.ocr_provider' => 'google', 'services.google.vision_key' => 'k', 'services.openai.key' => 'k']);
         Storage::fake('local');
         Http::fake([
             'vision.googleapis.com/*' => Http::response(['responses' => [['fullTextAnnotation' => ['text' => 'abc']]]]),

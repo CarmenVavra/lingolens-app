@@ -37,6 +37,7 @@ export default (config) => ({
     textTypes: config.textTypes,
     chemistry: config.chemistry,
     extensions: config.extensions,
+    photoFormats: config.photoFormats,
     maxBytes: config.maxBytes,
     previewUrl: null,
     previewBroken: false,
@@ -149,7 +150,7 @@ export default (config) => ({
         this.reset();
 
         if (!kind || !this.extensions.includes(extension)) {
-            this.error = 'Dieses Format wird nicht unterstützt. Erlaubt sind PDF, Fotos (JPG, PNG, HEIC), Word (.docx) und TXT.';
+            this.error = `Dieses Format wird nicht unterstützt. Erlaubt sind PDF, Fotos (${this.photoFormats}), Word (.docx) und TXT.`;
             this.$refs.file.value = '';
 
             return;

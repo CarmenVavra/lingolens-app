@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+use App\Support\LingoLens;
 use Illuminate\Http\UploadedFile;
 
 /**
@@ -27,7 +28,20 @@ enum ScanSource: string
      */
     public static function allowedExtensions(): array
     {
-        return array_merge(...array_values(self::EXTENSIONS));
+        $extensions = array_merge(...array_values(self::EXTENSIONS));
+
+        // OpenAI cannot read HEIC. Without it in the file picker, iPhones convert photos to JPEG.
+        return LingoLens::ocrProvider() === 'google'
+            ? $extensions
+            : array_values(array_diff($extensions, ['heic', 'heif']));
+    }
+
+    /**
+     * Photo formats for hints and error messages, e.g. "JPG, PNG".
+     */
+    public static function photoFormatsLabel(): string
+    {
+        return LingoLens::ocrProvider() === 'google' ? 'JPG, PNG, HEIC' : 'JPG, PNG';
     }
 
     /**
@@ -69,7 +83,7 @@ enum ScanSource: string
     public function readingStep(): array
     {
         return match ($this) {
-            self::Photo => ['label' => 'Handschrift erkennen', 'sub' => 'Google Cloud Vision · OCR'],
+            self::Photo => ['label' => 'Handschrift erkennen', 'sub' => LingoLens::ocrLabel()],
             self::Pdf => ['label' => 'Text aus PDF lesen', 'sub' => 'Textebene oder Handschrift-Erkennung bei Scans'],
             self::Word => ['label' => 'Text aus Word-Datei lesen', 'sub' => 'Absätze und Überschriften übernehmen'],
             self::Text => ['label' => 'Textdatei lesen', 'sub' => 'Absätze übernehmen'],

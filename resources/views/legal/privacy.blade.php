@@ -94,37 +94,50 @@
             <dt>Hosting</dt>
             <dd>{{ $legal['hosting'] }} – Betrieb des Servers, auf dem LingoLens AI und alle Daten gespeichert sind.</dd>
 
-            <dt>Texterkennung (Google Cloud Vision)</dt>
-            <dd>
-                Google Cloud EMEA Limited, Dublin, Irland. Nur Fotos und gescannte PDFs werden zur Handschrift-Erkennung
-                übermittelt, nicht dein Name oder deine E-Mail-Adresse.
-                @if ($visionInEu)
-                    Wir nutzen den EU-Standort des Dienstes:
-                    Google speichert und verarbeitet diese Daten ausschließlich in der Europäischen Union.
-                @endif
-                Laut Google werden die Bilder nur zur Texterkennung verarbeitet und nicht zum Training verwendet.
-                Am Laptop geschriebene PDFs, Word- und Textdateien werden direkt auf unserem Server ausgelesen und
-                nicht an Google gesendet.
-            </dd>
+            @if ($ocrByGoogle)
+                <dt>Texterkennung (Google Cloud Vision)</dt>
+                <dd>
+                    Google Cloud EMEA Limited, Dublin, Irland. Nur Fotos und gescannte PDFs werden zur Handschrift-Erkennung
+                    übermittelt, nicht dein Name oder deine E-Mail-Adresse.
+                    @if ($visionInEu)
+                        Wir nutzen den EU-Standort des Dienstes:
+                        Google speichert und verarbeitet diese Daten ausschließlich in der Europäischen Union.
+                    @endif
+                    Laut Google werden die Bilder nur zur Texterkennung verarbeitet und nicht zum Training verwendet.
+                    Am Laptop geschriebene PDFs, Word- und Textdateien werden direkt auf unserem Server ausgelesen und
+                    nicht an Google gesendet.
+                </dd>
 
-            <dt>KI-Korrektur (OpenAI)</dt>
-            <dd>
-                OpenAI Ireland Ltd., Dublin, Irland. Übermittelt werden der erkannte Text sowie Schultyp, Fachrichtung und
-                Textsorte – nicht dein Name oder deine E-Mail-Adresse. Laut OpenAI werden über die API gesendete Daten
-                nicht zum Training der Modelle verwendet; zur Missbrauchserkennung können sie bis zu 30 Tage gespeichert werden.
-            </dd>
+                <dt>KI-Korrektur (OpenAI)</dt>
+                <dd>
+                    OpenAI Ireland Ltd., Dublin, Irland. Übermittelt werden der erkannte Text sowie Schultyp, Fachrichtung und
+                    Textsorte – nicht dein Name oder deine E-Mail-Adresse. Laut OpenAI werden über die API gesendete Daten
+                    nicht zum Training der Modelle verwendet; zur Missbrauchserkennung können sie bis zu 30 Tage gespeichert werden.
+                </dd>
+            @else
+                <dt>Texterkennung und KI-Korrektur (OpenAI)</dt>
+                <dd>
+                    OpenAI Ireland Ltd., Dublin, Irland. Fotos und gescannte PDFs werden an OpenAI übermittelt, damit eine KI
+                    deine Handschrift liest. Zur Korrektur werden der erkannte Text sowie Schultyp, Fachrichtung und Textsorte
+                    übermittelt – nicht dein Name oder deine E-Mail-Adresse. Am Laptop geschriebene PDFs, Word- und Textdateien
+                    werden direkt auf unserem Server ausgelesen; an OpenAI geht dann nur der Text zur Korrektur.
+                    Laut OpenAI werden über die API gesendete Daten nicht zum Training der Modelle verwendet; zur
+                    Missbrauchserkennung können sie bis zu 30 Tage gespeichert werden.
+                </dd>
+            @endif
         </dl>
     </section>
 
     <section id="drittland">
         <h2>5. Übermittlung in Drittländer</h2>
         <p>
-            OpenAI kann Daten auch in den USA verarbeiten. Diese Übermittlung ist durch Standardvertragsklauseln der
-            EU-Kommission (Art. 46 Abs. 2 lit. c DSGVO) im Auftragsverarbeitungsvertrag mit OpenAI abgesichert.
-            @unless ($visionInEu)
+            OpenAI kann Daten{{ $ocrByGoogle ? '' : ' – auch deine Fotos –' }} in den USA verarbeiten. Diese Übermittlung ist durch
+            Standardvertragsklauseln der EU-Kommission (Art. 46 Abs. 2 lit. c DSGVO) im Auftragsverarbeitungsvertrag mit
+            OpenAI abgesichert.
+            @if ($ocrByGoogle && ! $visionInEu)
                 Auch Google kann Daten außerhalb der EU verarbeiten; die Übermittlung ist ebenfalls durch
                 Standardvertragsklauseln abgesichert.
-            @endunless
+            @endif
         </p>
     </section>
 

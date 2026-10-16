@@ -28,8 +28,9 @@ class LegalController extends Controller
         $logDays = (int) config('logging.channels.daily.days');
         $visionInEu = str_contains((string) config('services.google.vision_endpoint'), 'eu-vision');
         $invitationDays = LingoLens::invitationDays();
+        $ocrByGoogle = LingoLens::ocrProvider() === 'google';
 
-        return view('legal.privacy', compact('legal', 'updatedAt', 'uploadLimitMb', 'sessionHours', 'logDays', 'visionInEu', 'invitationDays'));
+        return view('legal.privacy', compact('legal', 'updatedAt', 'uploadLimitMb', 'sessionHours', 'logDays', 'visionInEu', 'invitationDays', 'ocrByGoogle'));
     }
 
     private function updatedAt(): string

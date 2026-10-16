@@ -19,7 +19,24 @@ class LingoLens
             return filter_var($configured, FILTER_VALIDATE_BOOLEAN);
         }
 
-        return blank(config('services.google.vision_key')) || blank(config('services.openai.key'));
+        return blank(config('services.openai.key'))
+            || (self::ocrProvider() === 'google' && blank(config('services.google.vision_key')));
+    }
+
+    /**
+     * Who reads photos and scanned PDFs: "openai" (default) or "google".
+     */
+    public static function ocrProvider(): string
+    {
+        return config('lingolens.ocr_provider') === 'google' ? 'google' : 'openai';
+    }
+
+    /**
+     * Subtitle of the reading step on the processing screen.
+     */
+    public static function ocrLabel(): string
+    {
+        return self::ocrProvider() === 'google' ? 'Google Cloud Vision · OCR' : 'KI-Handschrift-Erkennung · OpenAI';
     }
 
     /**

@@ -92,7 +92,7 @@ class CorrectionModeTest extends TestCase
         $this->get(route('scans.processing', $scan))
             ->assertOk()
             ->assertSee('Handschrift erkennen')
-            ->assertSee('Google Cloud Vision · OCR');
+            ->assertSee('KI-Handschrift-Erkennung · OpenAI');
     }
 
     public function test_failed_scans_show_the_error_state(): void
