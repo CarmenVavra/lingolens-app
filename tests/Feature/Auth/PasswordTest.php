@@ -13,7 +13,7 @@ class PasswordTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const NEUTRAL_STATUS = 'Wenn ein Konto mit dieser E-Mail-Adresse existiert, haben wir dir einen Link zum Zurücksetzen geschickt. Er ist 60 Minuten gültig.';
+    private const NEUTRAL_STATUS = 'Wenn ein Konto mit dieser E-Mail-Adresse existiert, haben wir dir einen Link zum Zurücksetzen geschickt. Er ist 60 Minuten gültig. Keine E-Mail bekommen? Schau im Spam-Ordner nach und prüfe, ob du dich mit genau dieser Adresse registriert hast.';
 
     public function test_account_page_shows_profile_and_password_form(): void
     {

@@ -85,7 +85,7 @@ Im Ordner `lingolens`: `.env.production.example` kopieren → umbenennen in **`.
 - `APP_KEY=` den Schlüssel aus Schritt 2 eintragen (inkl. `base64:`)
 - `GOOGLE_VISION_API_KEY=` und `OPENAI_API_KEY=` eintragen
 - **`LEGAL_NAME`, `LEGAL_STREET`, `LEGAL_CITY`, `LEGAL_EMAIL`** ausfüllen – erscheinen in Impressum und Datenschutzerklärung (solange sie fehlen, zeigen die Seiten rote Hinweise)
-- **E-Mail für „Passwort vergessen“:** in Plesk ein Postfach anlegen (z. B. `noreply@caryssa.at`) und `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD` eintragen (SMTP-Server siehe Plesk → E-Mail-Einstellungen bzw. netcup CCP)
+- **E-Mail für „Passwort vergessen“:** `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD` und `MAIL_FROM_ADDRESS` eintragen. Benutzername und Absender müssen dasselbe **bestehende Postfach** sein (z. B. `admin@caryssa.at`), sonst lehnt netcup den Versand ab. Port 465 mit `MAIL_SCHEME=smtps`; Port 2525 funktioniert bei netcup nicht. Wer `noreply@caryssa.at` als Absender möchte, legt dafür in Plesk ein eigenes Postfach an.
 - optional `LINGOLENS_REGISTRATION_CODE=` setzen, damit sich nur deine Klasse registrieren kann
 - `LINGOLENS_DAILY_SCAN_LIMIT=` (Standard 20 Texte pro Schüler und Tag)
 
