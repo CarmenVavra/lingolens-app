@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#123C69">
+    <title>Keine Verbindung · LingoLens AI</title>
+    <link rel="icon" href="/icons/icon-192.png">
+    <style>
+        body {
+            margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; box-sizing: border-box;
+            background: #eee2dc; color: #20304a; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+        main { max-width: 420px; text-align: center; display: grid; gap: 16px; justify-items: center; }
+        img { width: 72px; height: 72px; }
+        h1 { margin: 0; color: #123c69; font-size: 24px; }
+        p { margin: 0; }
+        button {
+            min-height: 48px; padding: 12px 20px; border: 0; background: #ac3b61; color: #fff;
+            font: inherit; font-weight: 700; cursor: pointer;
+        }
+        button:hover { background: #952f52; }
+        button:focus-visible { outline: 3px solid #123c69; outline-offset: 3px; }
+    </style>
+</head>
+<body>
+    <main>
+        <img src="/icons/icon-192.png" alt="">
+        <h1>Keine Internetverbindung</h1>
+        <p>LingoLens braucht Internet, um deine Texte zu lesen und zu korrigieren. Prüfe dein WLAN oder deine mobilen Daten.</p>
+        <button type="button" onclick="location.reload()">Erneut versuchen</button>
+    </main>
+</body>
+</html>

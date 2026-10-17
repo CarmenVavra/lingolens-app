@@ -10,3 +10,10 @@ Alpine.data('correctionMode', correctionMode);
 
 window.Alpine = Alpine;
 Alpine.start();
+
+// Service worker: lets phones install LingoLens as a standalone app.
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
