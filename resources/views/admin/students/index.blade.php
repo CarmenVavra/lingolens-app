@@ -32,6 +32,9 @@
                         <span class="tag status-tag--{{ $accepted ? 'completed' : 'processing' }}">{{ $accepted ? 'Aktiv' : 'Einladung offen' }}</span>
 
                         <div class="student-row__actions">
+                            <a href="{{ route('admin.students.edit', $student) }}" class="btn btn-secondary" aria-label="{{ $student->name }} bearbeiten">
+                                <x-icon name="pencil" :size="18" />Bearbeiten
+                            </a>
                             @unless ($accepted)
                                 <form method="POST" action="{{ route('admin.students.invite', $student) }}">
                                     @csrf

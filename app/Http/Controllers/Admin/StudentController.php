@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\DeleteStudent;
 use App\Actions\InviteStudent;
+use App\Actions\UpdateStudent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreStudentRequest;
+use App\Http\Requests\Admin\UpdateStudentRequest;
 use App\Models\User;
 use App\Support\LingoLens;
 use Illuminate\Http\RedirectResponse;
@@ -45,6 +47,31 @@ class StudentController extends Controller
         $student = User::create($request->profile() + ['password' => Str::random(64)]);
 
         return $this->sendInvitation($invite, $student, "Konto für {$student->name} angelegt.");
+    }
+
+    public function edit(User $student): View
+    {
+        $departments = config('lingolens.departments');
+        $schoolForms = array_values(array_diff(config('lingolens.school_forms'), ['AHS']));
+
+        return view('admin.students.edit', compact('student', 'departments', 'schoolForms'));
+    }
+
+    public function update(UpdateStudentRequest $request, User $student, UpdateStudent $updateStudent, InviteStudent $invite): RedirectResponse
+    {
+        $emailChanged = $updateStudent->handle($student, $request->profile());
+        $message = "Änderungen für {$student->name} gespeichert.";
+
+        // An open invitation went to the old address – send it to the new one.
+        if ($emailChanged && ! $student->hasAcceptedInvitation()) {
+            return $this->sendInvitation($invite, $student, $message);
+        }
+
+        if ($emailChanged) {
+            $message .= " Ab jetzt meldet sich {$student->name} mit {$student->email} an.";
+        }
+
+        return redirect()->route('admin.students.index')->with('status', $message);
     }
 
     public function invite(User $student, InviteStudent $invite): RedirectResponse

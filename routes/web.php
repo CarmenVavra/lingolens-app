@@ -56,6 +56,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [StudentController::class, 'index'])->name('index');
         Route::get('/neu', [StudentController::class, 'create'])->name('create');
         Route::post('/', [StudentController::class, 'store'])->middleware('throttle:20,1')->name('store');
+        Route::get('/{student}/bearbeiten', [StudentController::class, 'edit'])->middleware('can:manage-student,student')->name('edit');
+        Route::put('/{student}', [StudentController::class, 'update'])->middleware(['can:manage-student,student', 'throttle:20,1'])->name('update');
         Route::post('/{student}/einladung', [StudentController::class, 'invite'])->middleware(['can:manage-student,student', 'throttle:20,1'])->name('invite');
         Route::delete('/{student}', [StudentController::class, 'destroy'])->middleware('can:manage-student,student')->name('destroy');
     });
