@@ -25,7 +25,7 @@ class InstallableAppTest extends TestCase
         foreach ($pages as $page) {
             $page->assertOk()
                 ->assertSee('<link rel="manifest" href="'.asset('manifest.webmanifest').'">', false)
-                ->assertSee('<link rel="apple-touch-icon" href="'.asset('icons/apple-touch-icon.png').'">', false)
+                ->assertSee('<link rel="apple-touch-icon" href="'.asset('app-icons/apple-touch-icon.png').'">', false)
                 ->assertSee('<meta name="theme-color"', false);
         }
     }
@@ -48,6 +48,8 @@ class InstallableAppTest extends TestCase
         $this->assertTrue($icons->contains('purpose', 'maskable'), 'Android needs a maskable icon for a full-size launcher icon.');
 
         foreach ($icons as $icon) {
+            // Apache (also on netcup/Plesk) maps /icons/ to its own folder – our files would never be reached.
+            $this->assertStringStartsNotWith('/icons/', $icon['src']);
             $path = public_path(ltrim($icon['src'], '/'));
             $this->assertFileExists($path);
             [$width, $height, $type] = getimagesize($path) ?: [0, 0, 0];
@@ -55,7 +57,7 @@ class InstallableAppTest extends TestCase
             $this->assertSame(IMAGETYPE_PNG, $type);
         }
 
-        [$width] = getimagesize(public_path('icons/apple-touch-icon.png')) ?: [0];
+        [$width] = getimagesize(public_path('app-icons/apple-touch-icon.png')) ?: [0];
         $this->assertSame(180, $width);
     }
 

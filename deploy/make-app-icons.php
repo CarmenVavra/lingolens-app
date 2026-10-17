@@ -11,7 +11,7 @@ const RASPBERRY = [0xAC, 0x3B, 0x61];
 const PEACH = [0xED, 0xC7, 0xB7];
 const SUPERSAMPLE = 4;
 
-$target = dirname(__DIR__).'/public/icons';
+$target = dirname(__DIR__).'/public/app-icons';
 if (! is_dir($target)) {
     mkdir($target, 0755, true);
 }

@@ -3,13 +3,13 @@
  * Makes the app installable as a standalone app and shows a friendly page
  * when there is no internet. Personal pages (texts, corrections) are never cached.
  */
-const CACHE = 'lingolens-offline-v1';
+const CACHE = 'lingolens-offline-v2';
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE)
-            .then((cache) => cache.addAll([OFFLINE_URL, '/icons/icon-192.png']))
+            .then((cache) => cache.addAll([OFFLINE_URL, '/app-icons/icon-192.png']))
             .then(() => self.skipWaiting()),
     );
 });
