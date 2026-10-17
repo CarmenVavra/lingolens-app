@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Entpacken fehlgeschlagen.' }
 Remove-Item $tarball
 
 # Nur fuer die Entwicklung benoetigt
-$devOnly = @('tests', 'UI_Mockups', '.claude', 'deploy', 'start.bat', 'stop.bat', 'build-release.bat',
+$devOnly = @('tests', 'UI_Mockups', '.claude', 'deploy', 'start.bat', 'start-handy.bat', 'stop.bat', 'build-release.bat',
     'phpunit.xml', 'phpstan.neon', 'CLAUDE.md', 'lingolens-konzept.pdf', 'lingolens-blueprint.md', '.env.example')
 foreach ($item in $devOnly) {
     $path = Join-Path $stage $item
