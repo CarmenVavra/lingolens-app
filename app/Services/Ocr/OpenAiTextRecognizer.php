@@ -22,7 +22,7 @@ class OpenAiTextRecognizer implements TextRecognizer
         .' Transkribiere den Text des Schülers exakt so, wie er geschrieben wurde – Zeichen für Zeichen.'
         .' Korrigiere NICHTS: Rechtschreib-, Grammatik- und Zeichensetzungsfehler müssen unverändert erhalten bleiben,'
         .' auch wenn du das richtige Wort erkennst.'
-        .' Lass weg: vom Schüler durchgestrichene Wörter, Korrekturen in anderer Farbe (z.B. von der Lehrkraft),'
+        .' Lass ersatzlos weg (ohne Platzhalter oder Balken): vom Schüler durchgestrichene Wörter, Korrekturen in anderer Farbe (z.B. von der Lehrkraft),'
         .' aufgedruckte Texte des Blattes und alles außerhalb des Blattes (z.B. Bildschirm, Browser, Tisch).'
         .' Behalte die Zeilen des Originals bei und trenne Absätze mit einer Leerzeile.'
         .' Antworte nur mit dem transkribierten Text, ohne Kommentar und ohne Formatierung.'
@@ -76,6 +76,11 @@ class OpenAiTextRecognizer implements TextRecognizer
             ->json('choices.0.message.content', '');
 
         // Some models wrap the answer in a code block despite the instruction.
-        return trim((string) preg_replace('/^```[a-z]*\s*|\s*```$/i', '', trim($text)));
+        $text = (string) preg_replace('/^```[a-z]*\s*|\s*```$/i', '', trim($text));
+
+        // Crossed-out words sometimes come back as black bars ("████") instead of being left out.
+        $text = (string) preg_replace('/[ \t]*[\x{2580}-\x{259F}\x{25A0}]+/u', '', $text);
+
+        return trim($text);
     }
 }

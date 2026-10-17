@@ -42,8 +42,12 @@ class ProcessTextScan implements ShouldQueue
             return;
         }
 
-        // Also covers the case where the job runs right after the HTTP response.
-        @set_time_limit($this->timeout);
+        // Runs right after the HTTP response (PHP-FPM): give it the job timeout.
+        // Never in the console: set_time_limit() would stay active for the whole
+        // long-running queue worker and kill it a few minutes later while idle.
+        if (! app()->runningInConsole()) {
+            @set_time_limit($this->timeout);
+        }
 
         try {
             // 1. Read the text

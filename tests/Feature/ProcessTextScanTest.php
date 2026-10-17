@@ -81,6 +81,36 @@ class ProcessTextScanTest extends TestCase
         Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'googleapis.com'));
     }
 
+    public function test_black_bars_for_crossed_out_words_are_removed(): void
+    {
+        config(['services.openai.key' => 'k']);
+        Storage::fake('local');
+        Http::fake(function (Request $request) {
+            return Http::response(['choices' => [['message' => ['content' => is_array($request['messages'][1]['content'])
+                ? "I am sitting in the garden.\nHabe you ever see a \u{2588}\u{2588}\u{2588}\u{2588} bird like that?"
+                : json_encode(['title' => 'Garden', 'summary' => '', 'textsorten_check' => '', 'matura_tipp' => '', 'corrections' => []]),
+            ]]]]);
+        });
+
+        $path = UploadedFile::fake()->image('garden.jpg')->store('scans/1', 'local');
+        $scan = Scan::factory()->create(['uses_sample' => false, 'file_path' => $path]);
+
+        ProcessTextScan::dispatchSync($scan);
+
+        $this->assertSame("I am sitting in the garden.\nHabe you ever see a bird like that?", $scan->refresh()->raw_extracted_text);
+    }
+
+    public function test_the_job_does_not_limit_the_runtime_of_the_queue_worker(): void
+    {
+        // A time limit set inside the job would stay active for the whole worker
+        // process and kill it minutes later while it waits for the next scan.
+        $limitBefore = ini_get('max_execution_time');
+
+        ProcessTextScan::dispatchSync(Scan::factory()->create(['uses_sample' => true]));
+
+        $this->assertSame($limitBefore, ini_get('max_execution_time'));
+    }
+
     public function test_openai_mode_does_not_need_a_google_key(): void
     {
         config(['services.openai.key' => 'k', 'services.google.vision_key' => null, 'lingolens.demo_mode' => null]);
