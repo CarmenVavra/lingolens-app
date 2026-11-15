@@ -120,6 +120,25 @@ Fehler stehen in `lingolens/storage/logs/laravel-JJJJ-MM-TT.log`.
 
 ## 4. Updates einspielen
 
+### Mit `deploy.sh` (empfohlen, per SSH)
+
+Einmalig: `.deploy.env.example` nach `.deploy.env` kopieren und die SSH-Daten eintragen (dieselben wie bei den anderen caryssa-Apps). Der SSH-Schlüssel muss ohne Passwort funktionieren.
+
+Danach in **Git Bash** im Projektordner:
+
+| Aufgabe | Befehl |
+|---|---|
+| Neue Version online stellen | Änderungen committen, dann `./deploy.sh` |
+| Nur den Build prüfen | `./deploy.sh --build-only` (lädt nichts hoch) |
+| Letzte Version zurückholen | `./deploy.sh --rollback` (Code zurück, Datenbank bleibt) |
+| Notfall ohne Tests | `./deploy.sh --skip-tests` |
+
+Das Skript prüft Tests, Pint und PHPStan, baut das Release lokal, lädt es hoch, schaltet den Wartungsmodus ein, **sichert die Datenbank**, tauscht den Code in `lingolens/`, führt die Migrationen aus und prüft am Ende `https://lingolens.caryssa.at/up`. `.env`, `database/database.sqlite` und `storage/` bleiben unangetastet; Dokumentstamm und geplante Aufgaben müssen nicht geändert werden. Schlägt ein Schritt fehl, kommt automatisch der bisherige Code zurück.
+
+Sicherungen liegen auf dem Server unter `lingolens.caryssa.at/deploy/` (`backups/` für die Datenbank, `previous/` für den alten Code).
+
+### Ohne SSH (Plesk-Dateimanager)
+
 1. Lokal committen → `build-release.bat`.
 2. In Plesk alle Ordner/Dateien in `lingolens` ersetzen, **außer**: `.env`, `database/database.sqlite`, `storage/`.
 3. Geplante Aufgabe `lingolens:install` → „Jetzt ausführen“.
