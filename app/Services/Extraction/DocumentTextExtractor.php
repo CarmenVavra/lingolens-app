@@ -34,9 +34,25 @@ class DocumentTextExtractor
      */
     public function extract(Scan $scan, string $contents): array
     {
-        [$text, $method] = match ($scan->source) {
-            ScanSource::Photo => [$this->ocr->recognizeImage($scan, $contents), self::METHOD_OCR],
-            ScanSource::Pdf => $this->fromPdf($scan, $contents),
+        return $this->read($scan, $scan->source, $contents, task: false);
+    }
+
+    /**
+     * The optional task prompt ("Aufgabenstellung") – usually a printed worksheet.
+     */
+    public function extractTask(Scan $scan, ScanSource $source, string $contents): string
+    {
+        return $this->read($scan, $source, $contents, task: true)['text'];
+    }
+
+    /**
+     * @return array{text: string, method: string}
+     */
+    private function read(Scan $scan, ScanSource $source, string $contents, bool $task): array
+    {
+        [$text, $method] = match ($source) {
+            ScanSource::Photo => [$this->ocr->recognizeImage($scan, $contents, $task), self::METHOD_OCR],
+            ScanSource::Pdf => $this->fromPdf($scan, $contents, $task),
             ScanSource::Word => [$this->word->read($contents), self::METHOD_DOCUMENT],
             ScanSource::Text => [$contents, self::METHOD_DOCUMENT],
         };
@@ -47,7 +63,7 @@ class DocumentTextExtractor
     /**
      * @return array{0: string, 1: string}
      */
-    private function fromPdf(Scan $scan, string $contents): array
+    private function fromPdf(Scan $scan, string $contents, bool $task): array
     {
         $layer = $this->pdf->read($contents);
 
@@ -55,6 +71,6 @@ class DocumentTextExtractor
             return [$layer, self::METHOD_TEXT_LAYER];
         }
 
-        return [$this->ocr->recognizePdf($scan, $contents), self::METHOD_OCR];
+        return [$this->ocr->recognizePdf($scan, $contents, $task), self::METHOD_OCR];
     }
 }

@@ -12,7 +12,28 @@ namespace App\Support;
 class DemoSamples
 {
     /** Text types that get the essay sample, everything else gets the lab report. */
-    private const ESSAY_LIKE = ['Essay', 'Article', 'Letter to the Editor', 'Blog Post'];
+    private const ESSAY_LIKE = ['Essay', 'Article', 'Letter to the Editor', 'Blog Post', 'Blog Entry', 'Blog Comment', 'Leaflet', 'Article', 'Email to the Editor'];
+
+    /** Task prompt used in demo mode when a photo of the task was uploaded. */
+    public const TASK_TEXT = "Your school is discussing whether smartphones should be banned during lessons.\nWrite an essay in which you\n- outline the advantages of smartphones in class\n- discuss possible problems\n- suggest a fair solution\nWrite around 250 words.";
+
+    /**
+     * Demo verdict on the task prompt.
+     *
+     * @return array{fit: string, feedback: string, tips: list<string>}
+     */
+    public static function taskCheck(): array
+    {
+        return [
+            'fit' => 'partly',
+            'feedback' => 'Du bleibst beim Thema und nennst Vor- und Nachteile. Der dritte Arbeitsauftrag (eine faire Lösung vorschlagen) fehlt aber fast ganz – dafür gibt es bei der Matura Abzüge bei „Task Achievement“.',
+            'tips' => [
+                'Hake jeden Bullet Point der Aufgabe ab, bevor du abgibst.',
+                'Gib jedem Arbeitsauftrag einen eigenen Absatz.',
+                'Schließe mit einem konkreten Lösungsvorschlag, z.B. Handys nur für Unterrichtsaufgaben.',
+            ],
+        ];
+    }
 
     /**
      * @return array{title: string, text: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>}

@@ -143,6 +143,37 @@
                     </section>
                 @endif
 
+                @if ($feedback?->task_fit)
+                    <section class="info-panel info-panel--task is-{{ $feedback->task_fit->slug() }}" aria-labelledby="task-check-title">
+                        <h2 id="task-check-title" class="kicker">Aufgaben-Check</h2>
+                        <span class="task-verdict">
+                            <x-icon :name="$feedback->task_fit->icon()" :size="18" :stroke="2.5" />{{ $feedback->task_fit->label() }}
+                        </span>
+                        @if ($feedback->task_feedback)
+                            <p>{{ $feedback->task_feedback }}</p>
+                        @endif
+                        @if ($feedback->task_tips)
+                            <span class="mini-label">So erfüllst du die Aufgabe besser</span>
+                            <ul class="task-tips">
+                                @foreach ($feedback->task_tips as $tip)
+                                    <li>{{ $tip }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                        @if ($scan->task_text)
+                            <details class="task-prompt">
+                                <summary>Aufgabenstellung anzeigen</summary>
+                                <p>{{ $scan->task_text }}</p>
+                            </details>
+                        @endif
+                    </section>
+                @elseif ($feedback && $scan->hasTask())
+                    <section class="info-panel info-panel--summary" role="note">
+                        <h2 class="kicker">Aufgaben-Check</h2>
+                        <p>Die Aufgabenstellung konnte nicht gelesen werden. Fotografiere sie beim nächsten Mal gerade und gut beleuchtet oder tippe sie ein.</p>
+                    </section>
+                @endif
+
                 @if ($feedback)
                     <section class="info-panel info-panel--tip">
                         <h2 class="kicker"><x-icon name="lightbulb" :size="18" />Matura-Tipp</h2>

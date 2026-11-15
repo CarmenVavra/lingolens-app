@@ -11,11 +11,13 @@ interface TextRecognizer
 {
     /**
      * @param  string  $imageContents  Raw binary image data
+     * @param  bool  $task  Read the (printed) task prompt instead of the student text
      */
-    public function recognizeImage(Scan $scan, string $imageContents): string;
+    public function recognizeImage(Scan $scan, string $imageContents, bool $task = false): string;
 
     /**
      * @param  string  $pdfContents  Raw binary PDF data (scanned pages without text layer)
+     * @param  bool  $task  Read the (printed) task prompt instead of the student text
      */
-    public function recognizePdf(Scan $scan, string $pdfContents): string;
+    public function recognizePdf(Scan $scan, string $pdfContents, bool $task = false): string;
 }

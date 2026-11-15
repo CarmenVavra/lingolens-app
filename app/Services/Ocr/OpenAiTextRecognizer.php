@@ -28,38 +28,46 @@ class OpenAiTextRecognizer implements TextRecognizer
         .' Antworte nur mit dem transkribierten Text, ohne Kommentar und ohne Formatierung.'
         .' Ist kein Schülertext erkennbar, antworte mit einer leeren Nachricht.';
 
+    /** The task prompt is usually printed (worksheet, Matura booklet): here the printed text is what we want. */
+    private const TASK_PROMPT = 'Du bist eine Texterkennung (OCR) für englische Schreibaufgaben (z.B. Matura-Aufgabenblatt).'
+        .' Transkribiere die Aufgabenstellung vollständig: Situation, Textsorte, Arbeitsaufträge bzw. Bullet Points und die geforderte Wortanzahl.'
+        .' Lass alles weg, was nicht zur Aufgabenstellung gehört (z.B. Seitenzahlen, Logos, Bildschirm, Tisch).'
+        .' Behalte Aufzählungen bei, eine Zeile pro Punkt.'
+        .' Antworte nur mit dem transkribierten Text, ohne Kommentar und ohne Formatierung.'
+        .' Ist keine Aufgabenstellung erkennbar, antworte mit einer leeren Nachricht.';
+
     public function __construct(
         private readonly string $apiKey,
         private readonly string $model,
     ) {}
 
-    public function recognizeImage(Scan $scan, string $imageContents): string
+    public function recognizeImage(Scan $scan, string $imageContents, bool $task = false): string
     {
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($imageContents) ?: 'image/jpeg';
 
         return $this->transcribe([
             'type' => 'image_url',
             'image_url' => ['url' => "data:{$mime};base64,".base64_encode($imageContents), 'detail' => 'high'],
-        ]);
+        ], $task);
     }
 
-    public function recognizePdf(Scan $scan, string $pdfContents): string
+    public function recognizePdf(Scan $scan, string $pdfContents, bool $task = false): string
     {
         return $this->transcribe([
             'type' => 'file',
             'file' => ['filename' => 'scan.pdf', 'file_data' => 'data:application/pdf;base64,'.base64_encode($pdfContents)],
-        ]);
+        ], $task);
     }
 
     /**
      * @param  array<string, mixed>  $content  Image or file part of the user message
      */
-    private function transcribe(array $content): string
+    private function transcribe(array $content, bool $task): string
     {
         $payload = [
             'model' => $this->model,
             'messages' => [
-                ['role' => 'system', 'content' => self::PROMPT],
+                ['role' => 'system', 'content' => $task ? self::TASK_PROMPT : self::PROMPT],
                 ['role' => 'user', 'content' => [$content]],
             ],
         ];

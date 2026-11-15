@@ -66,6 +66,7 @@ class ProcessTextScan implements ShouldQueue
 
             $scan->update([
                 'raw_extracted_text' => $text,
+                'task_text' => $this->readTask($extractor),
                 'word_count' => str_word_count($text),
                 'extraction_method' => $method,
                 'progress_step' => 2,
@@ -100,6 +101,11 @@ class ProcessTextScan implements ShouldQueue
                 Storage::disk('local')->delete($scan->file_path);
                 $scan->update(['file_path' => null]);
             }
+
+            if ($scan->task_file_path) {
+                Storage::disk('local')->delete($scan->task_file_path);
+                $scan->update(['task_file_path' => null]);
+            }
         }
     }
 
@@ -120,6 +126,40 @@ class ProcessTextScan implements ShouldQueue
         }
 
         return $extractor->extract($this->scan, $contents);
+    }
+
+    /**
+     * Typed and/or photographed task prompt. An unreadable photo does not fail
+     * the scan: the text is still corrected, only the task check is missing.
+     */
+    private function readTask(DocumentTextExtractor $extractor): ?string
+    {
+        $scan = $this->scan;
+        $parts = [];
+
+        if ($scan->task_text !== null) {
+            $parts[] = $scan->task_text;
+        }
+
+        if ($scan->task_source !== null && $scan->task_file_path !== null) {
+            if (LingoLens::demoMode()) {
+                $parts[] = DemoSamples::TASK_TEXT;
+            } elseif (($contents = Storage::disk('local')->get($scan->task_file_path)) !== null) {
+                try {
+                    $parts[] = $extractor->extractTask($scan, $scan->task_source, $contents);
+                } catch (Throwable $e) {
+                    report($e);
+                }
+            }
+        }
+
+        $task = trim(implode("\n\n", array_filter($parts, fn (string $part) => trim($part) !== '')));
+
+        if (mb_strlen($task) < (int) config('lingolens.min_task_characters')) {
+            return null;
+        }
+
+        return mb_substr($task, 0, (int) config('lingolens.max_task_characters'));
     }
 
     /**

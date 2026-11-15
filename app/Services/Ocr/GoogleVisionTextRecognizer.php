@@ -24,7 +24,7 @@ class GoogleVisionTextRecognizer implements TextRecognizer
         private readonly string $endpoint = 'https://eu-vision.googleapis.com',
     ) {}
 
-    public function recognizeImage(Scan $scan, string $imageContents): string
+    public function recognizeImage(Scan $scan, string $imageContents, bool $task = false): string
     {
         $response = $this->post(self::IMAGE_PATH, [
             'image' => ['content' => base64_encode($imageContents)],
@@ -35,7 +35,7 @@ class GoogleVisionTextRecognizer implements TextRecognizer
         return trim((string) $response->json('responses.0.fullTextAnnotation.text', ''));
     }
 
-    public function recognizePdf(Scan $scan, string $pdfContents): string
+    public function recognizePdf(Scan $scan, string $pdfContents, bool $task = false): string
     {
         $response = $this->post(self::FILE_PATH, [
             'inputConfig' => ['content' => base64_encode($pdfContents), 'mimeType' => 'application/pdf'],

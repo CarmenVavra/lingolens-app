@@ -2,6 +2,7 @@
 
 namespace App\Services\Correction;
 
+use App\Enums\TaskFit;
 use App\Exceptions\ScanProcessingException;
 use App\Models\Scan;
 use Illuminate\Support\Facades\Http;
@@ -63,7 +64,7 @@ class OpenAiTextCorrector implements TextCorrector
      * Validate and normalise the AI JSON so only well-formed data is stored.
      *
      * @param  array<mixed>  $data
-     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>}
+     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check: array{fit: string, feedback: string, tips: list<string>}|null}
      */
     public static function normalize(array $data): array
     {
@@ -95,6 +96,32 @@ class OpenAiTextCorrector implements TextCorrector
             'textsorten_check' => trim((string) ($data['textsorten_check'] ?? '')),
             'matura_tipp' => trim((string) ($data['matura_tipp'] ?? '')),
             'corrections' => $corrections,
+            'task_check' => self::normalizeTaskCheck($data['aufgaben_check'] ?? null),
+        ];
+    }
+
+    /**
+     * Verdict on the task prompt – only present when the student added one.
+     *
+     * @return array{fit: string, feedback: string, tips: list<string>}|null
+     */
+    private static function normalizeTaskCheck(mixed $check): ?array
+    {
+        if (! is_array($check)) {
+            return null;
+        }
+
+        $tips = collect(is_array($check['tipps'] ?? null) ? $check['tipps'] : [])
+            ->filter(fn (mixed $tip) => is_string($tip) && trim($tip) !== '')
+            ->map(fn (string $tip) => mb_substr(trim($tip), 0, 500))
+            ->take(5)
+            ->values()
+            ->all();
+
+        return [
+            'fit' => TaskFit::fromAi((string) ($check['bewertung'] ?? ''))->value,
+            'feedback' => trim((string) ($check['begruendung'] ?? '')),
+            'tips' => $tips,
         ];
     }
 }

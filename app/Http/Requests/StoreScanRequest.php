@@ -38,6 +38,14 @@ class StoreScanRequest extends FormRequest
                 'mimes:'.implode(',', ScanSource::allowedExtensions()),
                 'max:'.config('lingolens.max_upload_kb'),
             ],
+            // Optional task prompt: photo/document of the worksheet or typed in.
+            'task_file' => [
+                'nullable',
+                'file',
+                'mimes:'.implode(',', ScanSource::allowedExtensions()),
+                'max:'.config('lingolens.max_upload_kb'),
+            ],
+            'task_text' => ['nullable', 'string', 'max:'.config('lingolens.max_task_characters')],
         ];
     }
 
@@ -67,6 +75,8 @@ class StoreScanRequest extends FormRequest
             'department' => 'Fachrichtung',
             'text_type' => 'Textsorte',
             'file' => 'Datei',
+            'task_file' => 'Aufgabenstellung',
+            'task_text' => 'Aufgabenstellung',
         ];
     }
 
@@ -79,6 +89,9 @@ class StoreScanRequest extends FormRequest
             'file.required_unless' => 'Bitte fotografiere deinen Text oder lade eine Datei hoch.',
             'file.mimes' => 'Erlaubt sind PDF, Fotos ('.ScanSource::photoFormatsLabel().'), Word (.docx) und TXT.',
             'file.max' => 'Die Datei darf höchstens 10 MB groß sein.',
+            'task_file.mimes' => 'Die Aufgabenstellung muss ein Foto ('.ScanSource::photoFormatsLabel().'), PDF, Word (.docx) oder TXT sein.',
+            'task_file.max' => 'Die Aufgabenstellung darf höchstens 10 MB groß sein.',
+            'task_text.max' => 'Die Aufgabenstellung darf höchstens :max Zeichen lang sein.',
             'text_type.in' => 'Diese Textsorte passt nicht zum gewählten Schultyp.',
         ];
     }

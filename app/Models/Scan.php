@@ -22,6 +22,9 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property string|null $title
  * @property string|null $raw_extracted_text
+ * @property string|null $task_text
+ * @property ScanSource|null $task_source
+ * @property string|null $task_file_path
  * @property int $word_count
  * @property SchoolType $school_type
  * @property string|null $department
@@ -51,6 +54,9 @@ class Scan extends Model
     protected $fillable = [
         'title',
         'raw_extracted_text',
+        'task_text',
+        'task_source',
+        'task_file_path',
         'word_count',
         'school_type',
         'department',
@@ -85,6 +91,7 @@ class Scan extends Model
             'school_type' => SchoolType::class,
             'status' => ScanStatus::class,
             'source' => ScanSource::class,
+            'task_source' => ScanSource::class,
             'progress_step' => 'integer',
             'word_count' => 'integer',
             'uses_sample' => 'boolean',
@@ -146,6 +153,14 @@ class Scan extends Model
     public function isProcessing(): bool
     {
         return $this->status === ScanStatus::Processing;
+    }
+
+    /**
+     * The student added a task prompt (photographed, uploaded or typed).
+     */
+    public function hasTask(): bool
+    {
+        return $this->task_text !== null || $this->task_source !== null;
     }
 
     public function displayTitle(): string

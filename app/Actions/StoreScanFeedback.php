@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 class StoreScanFeedback
 {
     /**
-     * @param  array{summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>}  $result
+     * @param  array{summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check?: array{fit: string, feedback: string, tips: list<string>}|null}  $result
      */
     public function handle(Scan $scan, array $result): Feedback
     {
@@ -27,6 +27,9 @@ class StoreScanFeedback
                 'ai_summary' => $result['summary'],
                 'layout_feedback' => $result['textsorten_check'],
                 'matura_tip' => $result['matura_tipp'],
+                'task_fit' => $result['task_check']['fit'] ?? null,
+                'task_feedback' => $result['task_check']['feedback'] ?? null,
+                'task_tips' => $result['task_check']['tips'] ?? null,
             ]);
 
             foreach ($result['corrections'] as $index => $correction) {

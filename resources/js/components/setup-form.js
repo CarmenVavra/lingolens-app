@@ -1,6 +1,7 @@
 /**
  * Setup & upload form ("Weichen-Formular"): school type → department →
- * text type, plus the text itself as photo, PDF, Word or TXT file.
+ * text type, plus the text itself as photo, PDF, Word or TXT file and an
+ * optional task prompt (photo, document or typed).
  * Switching the school type resets the text type.
  */
 const KINDS = {
@@ -48,6 +49,8 @@ export default (config) => ({
     dragging: false,
     error: '',
     submitting: false,
+    taskName: '',
+    taskError: '',
 
     get types() {
         return this.textTypes[this.school] ?? [];
@@ -169,6 +172,69 @@ export default (config) => ({
 
         if (kind === 'photo') {
             this.previewUrl = URL.createObjectURL(file);
+        }
+    },
+
+    /** Optional task prompt (photo or document of the worksheet). */
+    onTaskFile(event) {
+        const file = event.target.files && event.target.files[0];
+
+        if (file) {
+            this.acceptTask(file);
+        }
+    },
+
+    onTaskCamera(event) {
+        const file = event.target.files && event.target.files[0];
+        event.target.value = '';
+
+        if (!file) {
+            return;
+        }
+
+        try {
+            const transfer = new DataTransfer();
+            transfer.items.add(file);
+            this.$refs.taskFile.files = transfer.files;
+        } catch {
+            this.taskError = 'Dein Browser unterstützt das nicht. Bitte wähle die Datei über „Aufgabe hochladen“.';
+
+            return;
+        }
+
+        this.acceptTask(file);
+    },
+
+    acceptTask(file) {
+        const extension = extensionOf(file.name);
+        this.taskError = '';
+
+        if (!kindOf(extension) || !this.extensions.includes(extension)) {
+            this.taskError = `Dieses Format wird nicht unterstützt. Erlaubt sind PDF, Fotos (${this.photoFormats}), Word (.docx) und TXT.`;
+            this.clearTask(false);
+
+            return;
+        }
+
+        if (file.size > this.maxBytes) {
+            this.taskError = 'Die Aufgabenstellung ist größer als 10 MB.';
+            this.clearTask(false);
+
+            return;
+        }
+
+        this.taskName = file.name + ' · ' + formatSize(file.size);
+    },
+
+    clearTask(resetError = true) {
+        this.taskName = '';
+
+        if (resetError) {
+            this.taskError = '';
+        }
+
+        if (this.$refs.taskFile) {
+            this.$refs.taskFile.value = '';
         }
     },
 

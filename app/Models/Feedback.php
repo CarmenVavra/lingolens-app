@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TaskFit;
 use Database\Factories\FeedbackFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $ai_summary
  * @property string $layout_feedback
  * @property string $matura_tip
+ * @property TaskFit|null $task_fit
+ * @property string|null $task_feedback
+ * @property list<string>|null $task_tips
  */
 class Feedback extends Model
 {
@@ -31,7 +35,21 @@ class Feedback extends Model
         'ai_summary',
         'layout_feedback',
         'matura_tip',
+        'task_fit',
+        'task_feedback',
+        'task_tips',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'task_fit' => TaskFit::class,
+            'task_tips' => 'array',
+        ];
+    }
 
     /**
      * @return BelongsTo<Scan, $this>

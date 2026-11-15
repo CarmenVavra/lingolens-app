@@ -59,7 +59,7 @@ class ScanController extends Controller
 
     public function store(StoreScanRequest $request, CreateScan $createScan): RedirectResponse
     {
-        $scan = $createScan->handle($request->user(), $request->validated(), $request->file('file'));
+        $scan = $createScan->handle($request->user(), $request->validated(), $request->file('file'), $request->file('task_file'));
 
         return redirect()->route('scans.processing', $scan);
     }

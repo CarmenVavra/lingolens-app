@@ -85,24 +85,75 @@
                         <h2>Textsorte</h2>
                         <span class="setup-step__hint">Matura-Textsorten <span x-text="school">{{ $schoolType->value }}</span></span>
                     </legend>
-                    <div class="chip-list">
-                        <template x-for="type in types" :key="school + type">
-                            <label class="chip">
-                                <input type="radio" name="text_type" :value="type" x-model="textType">
-                                <span x-text="type"></span>
-                            </label>
-                        </template>
+                    {{-- A compact dropdown: BHS offers almost 20 text types. --}}
+                    <div class="field">
+                        <label for="text_type" class="sr-only">Textsorte wählen</label>
+                        <select id="text_type" name="text_type" class="select" x-model="textType"
+                            @error('text_type') aria-invalid="true" aria-describedby="text-type-error" @enderror>
+                            <template x-for="type in types" :key="school + type">
+                                <option :value="type" x-text="type" :selected="type === textType"></option>
+                            </template>
+                        </select>
                     </div>
                     @error('text_type')
-                        <span class="field-error">{{ $message }}</span>
+                        <span id="text-type-error" class="field-error">{{ $message }}</span>
                     @enderror
                 </fieldset>
 
-                {{-- 3. Photo --}}
-                {{-- 3. The text: photo, PDF, Word or TXT – handwritten or typed --}}
+                {{-- 3. Optional task prompt (before the text, as in the exam): LingoLens checks whether the text answers it --}}
                 <fieldset class="setup-step">
                     <legend class="setup-step__head" style="float:left;width:100%">
                         <span class="step-badge step-badge--3" aria-hidden="true">3</span>
+                        <h2>Aufgabenstellung</h2>
+                        <span class="setup-step__hint">optional · prüft, ob dein Text zur Aufgabe passt</span>
+                    </legend>
+
+                    <input type="file" id="task_file" name="task_file" x-ref="taskFile" class="sr-only-focusable"
+                        accept="{{ $accept }}" aria-describedby="task-hint" @change="onTaskFile($event)">
+                    <input type="file" id="task_camera" x-ref="taskCamera" class="sr-only-focusable" tabindex="-1"
+                        accept="image/*" capture="environment" @change="onTaskCamera($event)">
+
+                    <div class="task-actions" x-show="!taskName">
+                        <label for="task_camera" class="btn btn-secondary only-mobile">
+                            <x-icon name="camera" :size="18" />Aufgabe fotografieren
+                        </label>
+                        <label for="task_file" class="btn btn-secondary">
+                            <x-icon name="upload" :size="18" />Aufgabe hochladen
+                        </label>
+                    </div>
+
+                    <div class="task-file" x-show="taskName" x-cloak role="status">
+                        <x-icon name="check" :size="16" :stroke="2.5" />
+                        <span class="task-file__name" x-text="taskName"></span>
+                        <button type="button" class="btn btn-ghost" @click="clearTask()">Entfernen</button>
+                    </div>
+
+                    <div class="field">
+                        <label for="task_text">… oder hier eintippen bzw. einfügen</label>
+                        <textarea id="task_text" name="task_text" class="input textarea" rows="4"
+                            maxlength="{{ config('lingolens.max_task_characters') }}"
+                            placeholder="z.B. Write a blog comment in which you …"
+                            @error('task_text') aria-invalid="true" aria-describedby="task-hint task-text-error" @else aria-describedby="task-hint" @enderror>{{ old('task_text') }}</textarea>
+                    </div>
+
+                    <span id="task-hint" class="setup-step__hint">
+                        Foto, PDF, Word oder TXT der Angabe. Du bekommst eine Einschätzung, ob dein Text die Aufgabe erfüllt
+                        oder eine Themenverfehlung ist – mit Tipps, wie es besser geht.
+                    </span>
+
+                    <span class="field-error" role="alert" x-show="taskError" x-text="taskError" x-cloak></span>
+                    @error('task_file')
+                        <span class="field-error">{{ $message }}</span>
+                    @enderror
+                    @error('task_text')
+                        <span id="task-text-error" class="field-error">{{ $message }}</span>
+                    @enderror
+                </fieldset>
+
+                {{-- 4. The text: photo, PDF, Word or TXT – handwritten or typed --}}
+                <fieldset class="setup-step">
+                    <legend class="setup-step__head" style="float:left;width:100%">
+                        <span class="step-badge step-badge--4" aria-hidden="true">4</span>
                         <h2>Dein Text</h2>
                         <span class="setup-step__hint">handschriftlich oder am Laptop geschrieben</span>
                     </legend>
