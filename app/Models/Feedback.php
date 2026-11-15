@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $matura_tip
  * @property TaskFit|null $task_fit
  * @property string|null $task_feedback
- * @property list<string>|null $task_tips
+ * @property list<string|array{tip?: string, example?: string}>|null $task_tips
  * @property array{criteria: array<string, array{score: int|null, reason: string}>, total: int|null, max: int, word_count: int, required_words: int|null, word_penalty: bool, off_topic: bool}|null $rubric
  */
 class Feedback extends Model
@@ -52,6 +52,21 @@ class Feedback extends Model
             'task_tips' => 'array',
             'rubric' => 'array',
         ];
+    }
+
+    /**
+     * Tips of the task check as tip + English example (older feedback has plain strings).
+     *
+     * @return list<array{tip: string, example: string}>
+     */
+    public function taskTips(): array
+    {
+        return array_map(
+            fn (mixed $tip) => is_array($tip)
+                ? ['tip' => (string) ($tip['tip'] ?? ''), 'example' => (string) ($tip['example'] ?? '')]
+                : ['tip' => (string) $tip, 'example' => ''],
+            $this->task_tips ?? [],
+        );
     }
 
     /**

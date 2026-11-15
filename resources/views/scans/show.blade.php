@@ -152,11 +152,16 @@
                         @if ($feedback->task_feedback)
                             <p>{{ $feedback->task_feedback }}</p>
                         @endif
-                        @if ($feedback->task_tips)
+                        @if ($feedback->taskTips())
                             <span class="mini-label">So erfüllst du die Aufgabe besser</span>
                             <ul class="task-tips">
-                                @foreach ($feedback->task_tips as $tip)
-                                    <li>{{ $tip }}</li>
+                                @foreach ($feedback->taskTips() as $tip)
+                                    <li>
+                                        {{ $tip['tip'] }}
+                                        @if ($tip['example'] !== '')
+                                            <span class="task-tip__example"><span class="sr-only">Beispiel: </span><span lang="en">{{ $tip['example'] }}</span></span>
+                                        @endif
+                                    </li>
                                 @endforeach
                             </ul>
                         @endif
@@ -183,6 +188,23 @@
                                 <span class="rubric-total__points">{{ $rubric['total'] }}</span>
                                 <span>von {{ $rubric['max'] }} Punkten</span>
                             </p>
+                        @endif
+                        @if (($rubric['grade'] ?? null) !== null)
+                            <div class="rubric-grade is-grade-{{ $rubric['grade'] }}">
+                                <span class="rubric-grade__number" aria-hidden="true">{{ $rubric['grade'] }}</span>
+                                <span>
+                                    <span class="rubric-grade__label">Notenschätzung: {{ App\Services\Rubric\SrdpRubric::gradeLabel($rubric['grade']) }} ({{ $rubric['grade'] }})</span>
+                                    <span class="rubric-grade__hint">
+                                        @if ($rubric['off_topic'])
+                                            Themenverfehlung – die Arbeit wäre negativ.
+                                        @else
+                                            {{ $rubric['percent'] }} % der Punkte auf Niveau {{ $rubric['level'] ?? 'B2' }}
+                                        @endif
+                                    </span>
+                                </span>
+                            </div>
+                        @elseif ($rubric['total'] !== null)
+                            <p class="rubric-meta">Eine Notenschätzung gibt es, wenn du die Aufgabenstellung mitschickst.</p>
                         @endif
                         <dl class="rubric-list">
                             @foreach (config('srdp.criteria') as $key => $criterion)

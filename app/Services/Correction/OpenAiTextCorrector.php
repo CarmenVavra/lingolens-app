@@ -65,7 +65,7 @@ class OpenAiTextCorrector implements TextCorrector
      * Validate and normalise the AI JSON so only well-formed data is stored.
      *
      * @param  array<mixed>  $data
-     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check: array{fit: string, feedback: string, tips: list<string>}|null, rubric: array<string, array{score: int|null, reason: string}>|null}
+     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check: array{fit: string, feedback: string, tips: list<array{tip: string, example: string}>}|null, rubric: array<string, array{score: int|null, reason: string}>|null}
      */
     public static function normalize(array $data): array
     {
@@ -105,7 +105,7 @@ class OpenAiTextCorrector implements TextCorrector
     /**
      * Verdict on the task prompt – only present when the student added one.
      *
-     * @return array{fit: string, feedback: string, tips: list<string>}|null
+     * @return array{fit: string, feedback: string, tips: list<array{tip: string, example: string}>}|null
      */
     private static function normalizeTaskCheck(mixed $check): ?array
     {
@@ -114,8 +114,11 @@ class OpenAiTextCorrector implements TextCorrector
         }
 
         $tips = collect(is_array($check['tipps'] ?? null) ? $check['tipps'] : [])
-            ->filter(fn (mixed $tip) => is_string($tip) && trim($tip) !== '')
-            ->map(fn (string $tip) => mb_substr(trim($tip), 0, 500))
+            ->map(fn (mixed $tip) => is_array($tip)
+                ? ['tip' => (string) ($tip['tipp'] ?? ''), 'example' => (string) ($tip['beispiel'] ?? '')]
+                : ['tip' => is_string($tip) ? $tip : '', 'example' => ''])
+            ->map(fn (array $tip) => ['tip' => mb_substr(trim($tip['tip']), 0, 500), 'example' => mb_substr(trim($tip['example']), 0, 600)])
+            ->filter(fn (array $tip) => $tip['tip'] !== '')
             ->take(5)
             ->values()
             ->all();

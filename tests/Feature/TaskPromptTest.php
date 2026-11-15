@@ -111,7 +111,11 @@ class TaskPromptTest extends TestCase
                 'aufgaben_check' => [
                     'bewertung' => 'verfehlt',
                     'begruendung' => 'Der Text behandelt Urlaub statt Schuluniformen.',
-                    'tipps' => ['Beziehe dich auf Sarahs Post.', 'Nenne zwei Gründe.', ''],
+                    'tipps' => [
+                        ['tipp' => 'Beziehe dich auf Sarahs Post.', 'beispiel' => "I've just read your post about school uniforms, Sarah, and I couldn't agree more."],
+                        'Nenne zwei Gründe.',
+                        ['tipp' => '', 'beispiel' => 'leer'],
+                    ],
                 ],
             ])]]]]);
         });
@@ -132,7 +136,10 @@ class TaskPromptTest extends TestCase
         $this->assertSame(self::TASK, $scan->task_text);
         $this->assertSame(TaskFit::OffTopic, $scan->latestFeedback->task_fit);
         $this->assertSame('Der Text behandelt Urlaub statt Schuluniformen.', $scan->latestFeedback->task_feedback);
-        $this->assertSame(['Beziehe dich auf Sarahs Post.', 'Nenne zwei Gründe.'], $scan->latestFeedback->task_tips);
+        $this->assertSame([
+            ['tip' => 'Beziehe dich auf Sarahs Post.', 'example' => "I've just read your post about school uniforms, Sarah, and I couldn't agree more."],
+            ['tip' => 'Nenne zwei Gründe.', 'example' => ''],
+        ], $scan->latestFeedback->taskTips());
 
         Http::assertSentCount(3);
         Http::assertSent(fn (Request $request) => is_string($request['messages'][1]['content'])
@@ -201,6 +208,8 @@ class TaskPromptTest extends TestCase
             ->assertSee('Teilweise erfüllt')
             ->assertSee('So erfüllst du die Aufgabe besser')
             ->assertSee('Hake jeden Bullet Point der Aufgabe ab, bevor du abgibst.')
+            ->assertSee('<span lang="en">Finally, I would like to suggest a fair solution that works for both students and teachers.</span>', false)
+            ->assertSee('Notenschätzung:')
             ->assertSee('Aufgabenstellung anzeigen')
             ->assertSee('&lt;b&gt;smartphones&lt;/b&gt;', false)
             ->assertDontSee('<b>smartphones</b>', false);

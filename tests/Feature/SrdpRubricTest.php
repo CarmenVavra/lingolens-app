@@ -88,7 +88,8 @@ class SrdpRubricTest extends TestCase
         $prompts = app(CorrectionPromptBuilder::class);
 
         $withTask = $prompts->build(Scan::factory()->make(['task_text' => self::TASK]));
-        $this->assertStringContainsString('SRDP-Bewertungsraster B1', $withTask);
+        $this->assertStringContainsString('IMMER auf Niveau B2', $withTask);
+        $this->assertStringContainsString('auch wenn in der Aufgabenstellung oder anderswo ein anderes Niveau (z.B. B1) genannt ist', $withTask);
         $this->assertStringContainsString("'srdp_bewertung'", $withTask);
         $this->assertStringContainsString('[sprachrichtigkeit] Sprachrichtigkeit:', $withTask);
         $this->assertStringContainsString('Berücksichtige die Wortanzahl NICHT', $withTask);
@@ -135,7 +136,7 @@ class SrdpRubricTest extends TestCase
 
         $this->actingAs($user)->get(route('scans.show', $scan))
             ->assertOk()
-            ->assertSeeInOrder(['SRDP-Bewertungsraster B1', '22', 'von 40 Punkten'])
+            ->assertSeeInOrder(['SRDP-Bewertung B2', '22', 'von 40 Punkten', 'Notenschätzung: Genügend (4)', '55 % der Punkte auf Niveau B2'])
             ->assertSeeInOrder(['Erfüllung der Aufgabenstellung', 'Kohärenz und Kohäsion', 'Spektrum sprachlicher Mittel', 'Sprachrichtigkeit'])
             ->assertSee('Viele Wiederholungen.')
             ->assertSee('um eine Stufe herabgesetzt')
@@ -154,10 +155,35 @@ class SrdpRubricTest extends TestCase
         $this->assertSame(18, $rubric['total']);
         $this->assertSame(30, $rubric['max']);
 
+        $this->assertNull($rubric['grade'], 'Without a task there is no grade estimate.');
+
         $this->actingAs($user)->get(route('scans.show', $scan))
             ->assertOk()
             ->assertSee('von 30 Punkten')
-            ->assertSee('Ohne Aufgabenstellung nicht bewertbar.');
+            ->assertSee('Ohne Aufgabenstellung nicht bewertbar.')
+            ->assertSee('Eine Notenschätzung gibt es, wenn du die Aufgabenstellung mitschickst.')
+            ->assertDontSee('Notenschätzung:');
+    }
+
+    public function test_the_grade_is_estimated_from_the_share_of_points(): void
+    {
+        $this->assertSame(1, SrdpRubric::grade(100));
+        $this->assertSame(1, SrdpRubric::grade(90));
+        $this->assertSame(2, SrdpRubric::grade(89));
+        $this->assertSame(3, SrdpRubric::grade(64));
+        $this->assertSame(4, SrdpRubric::grade(50));
+        $this->assertSame(5, SrdpRubric::grade(49));
+        $this->assertSame('Befriedigend', SrdpRubric::gradeLabel(3));
+
+        $rubric = app(SrdpRubric::class);
+        $scan = Scan::factory()->make(['task_text' => self::TASK, 'word_count' => 250]);
+
+        $good = $rubric->assess($this->criteria(9, 9, 8, 9), $scan, TaskFit::Fits);
+        $this->assertSame(88, $good['percent']);
+        $this->assertSame(2, $good['grade']);
+        $this->assertSame('B2', $good['level']);
+
+        $this->assertSame(5, $rubric->assess($this->criteria(8, 8, 8, 8), $scan, TaskFit::OffTopic)['grade'], 'A missed task is always negative.');
     }
 
     public function test_the_install_command_reports_the_ai_mode(): void

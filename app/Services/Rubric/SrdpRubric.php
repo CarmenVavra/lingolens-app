@@ -6,8 +6,8 @@ use App\Enums\TaskFit;
 use App\Models\Scan;
 
 /**
- * Assessment along the SRDP-Bewertungsraster B1 (config/srdp.php):
- * four criteria with 0–10 points each.
+ * Assessment along the SRDP criteria, always at level B2 (config/srdp.php):
+ * four criteria with 0–10 points each, plus an estimated Austrian grade.
  *
  * The AI suggests a score per criterion; the fixed rules of the raster are
  * applied here, so they never depend on the model:
@@ -15,7 +15,7 @@ use App\Models\Scan;
  * - word count more than 10 % off → "Erfüllung der Aufgabenstellung" one level lower
  *
  * @phpstan-type Criterion array{score: int|null, reason: string}
- * @phpstan-type Assessment array{criteria: array<string, Criterion>, total: int|null, max: int, word_count: int, required_words: int|null, word_penalty: bool, off_topic: bool}
+ * @phpstan-type Assessment array{criteria: array<string, Criterion>, total: int|null, max: int, word_count: int, required_words: int|null, word_penalty: bool, off_topic: bool, level: string, percent: int|null, grade: int|null}
  */
 class SrdpRubric
 {
@@ -32,7 +32,10 @@ class SrdpRubric
      */
     public function promptSection(Scan $scan): string
     {
-        $section = ' Bewerte den Text zusätzlich nach dem '.config('srdp.name').' (je Kriterium 0–10 Punkte).'
+        $level = config('srdp.level');
+        $section = " Bewerte den Text zusätzlich nach den SRDP-Kriterien (je Kriterium 0–10 Punkte), IMMER auf Niveau {$level}"
+            .' (Matura) – auch wenn in der Aufgabenstellung oder anderswo ein anderes Niveau (z.B. B1) genannt ist.'
+            ." Miss Wortschatz, Strukturen und Richtigkeit an den Erwartungen für {$level}."
             .' Beschreibungen gibt es für die geraden Stufen; die ungeraden Stufen (9, 7, 5, 3, 1) liegen dazwischen'
             .' und werden vergeben, wenn ein Text Merkmale beider Nachbarstufen zeigt.';
 
@@ -117,16 +120,46 @@ class SrdpRubric
         }
 
         $scores = array_filter(array_column($criteria, 'score'), fn (?int $score) => $score !== null);
+        $total = $scores === [] ? null : array_sum($scores);
+        $max = count($scores) * (int) config('srdp.max_per_criterion');
+        $complete = count($scores) === count(config('srdp.criteria'));
+        $percent = $complete && $max > 0 ? (int) round($total / $max * 100) : null;
 
         return [
             'criteria' => $criteria,
-            'total' => $scores === [] ? null : array_sum($scores),
-            'max' => count($scores) * (int) config('srdp.max_per_criterion'),
+            'total' => $total,
+            'max' => $max,
             'word_count' => $scan->word_count,
             'required_words' => $requiredWords,
             'word_penalty' => $wordPenalty,
             'off_topic' => $offTopic,
+            'level' => (string) config('srdp.level'),
+            'percent' => $percent,
+            // Only with all four criteria (i.e. with a task); a missed task is always a 5.
+            'grade' => $offTopic ? 5 : ($percent === null ? null : self::grade($percent)),
         ];
+    }
+
+    /**
+     * Austrian grade (1 = Sehr gut … 5 = Nicht genügend) for a share of points.
+     */
+    public static function grade(int $percent): int
+    {
+        $grades = config('srdp.grades');
+        krsort($grades);
+
+        foreach ($grades as $minimum => $grade) {
+            if ($percent >= $minimum) {
+                return (int) $grade;
+            }
+        }
+
+        return 5;
+    }
+
+    public static function gradeLabel(int $grade): string
+    {
+        return (string) (config('srdp.grade_labels')[$grade] ?? '');
     }
 
     /**

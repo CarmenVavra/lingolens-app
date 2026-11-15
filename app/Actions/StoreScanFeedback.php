@@ -19,7 +19,7 @@ class StoreScanFeedback
     public function __construct(private readonly SrdpRubric $rubric) {}
 
     /**
-     * @param  array{summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check?: array{fit: string, feedback: string, tips: list<string>}|null, rubric?: array<string, array{score: int|null, reason: string}>|null}  $result
+     * @param  array{summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check?: array{fit: string, feedback: string, tips: list<array{tip: string, example: string}>}|null, rubric?: array<string, array{score: int|null, reason: string}>|null}  $result
      */
     public function handle(Scan $scan, array $result): Feedback
     {

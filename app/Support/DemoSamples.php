@@ -20,7 +20,7 @@ class DemoSamples
     /**
      * Demo verdict on the task prompt.
      *
-     * @return array{fit: string, feedback: string, tips: list<string>}
+     * @return array{fit: string, feedback: string, tips: list<array{tip: string, example: string}>}
      */
     public static function taskCheck(): array
     {
@@ -28,9 +28,18 @@ class DemoSamples
             'fit' => 'partly',
             'feedback' => 'Du bleibst beim Thema und nennst Vor- und Nachteile. Der dritte Arbeitsauftrag (eine faire Lösung vorschlagen) fehlt aber fast ganz – dafür gibt es bei der Matura Abzüge bei „Task Achievement“.',
             'tips' => [
-                'Hake jeden Bullet Point der Aufgabe ab, bevor du abgibst.',
-                'Gib jedem Arbeitsauftrag einen eigenen Absatz.',
-                'Schließe mit einem konkreten Lösungsvorschlag, z.B. Handys nur für Unterrichtsaufgaben.',
+                [
+                    'tip' => 'Hake jeden Bullet Point der Aufgabe ab, bevor du abgibst.',
+                    'example' => 'Finally, I would like to suggest a fair solution that works for both students and teachers.',
+                ],
+                [
+                    'tip' => 'Gib jedem Arbeitsauftrag einen eigenen Absatz mit einem klaren Einstiegssatz.',
+                    'example' => 'On the other hand, smartphones can easily distract students during lessons.',
+                ],
+                [
+                    'tip' => 'Schließe mit einem konkreten Lösungsvorschlag.',
+                    'example' => 'A reasonable compromise would be to allow phones only for specific classroom tasks, such as research or vocabulary apps.',
+                ],
             ],
         ];
     }

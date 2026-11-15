@@ -67,7 +67,9 @@ class CorrectionPromptBuilder
             .($scan->task_text !== null
                 ? ", 'aufgaben_check' (Objekt mit 'bewertung': genau einer von 'passt', 'teilweise', 'verfehlt';"
                     ." 'begruendung': 2–3 Sätze, welche Arbeitsaufträge erfüllt sind und welche fehlen;"
-                    ." 'tipps': Array mit 2–4 konkreten Tipps, wie der Text die Aufgabe besser erfüllt)"
+                    ." 'tipps': Array mit 2–4 Objekten mit 'tipp' (konkreter Tipp auf Deutsch, wie der Text die Aufgabe besser erfüllt)"
+                    ." und 'beispiel' (ein kurzes englisches Beispiel auf B2-Niveau, 1–2 Sätze, passend zu Thema, Textsorte und"
+                    .' Zielgruppe der Aufgabe, das die Schülerin bzw. der Schüler so in den Text übernehmen könnte))'
                 : '')
             .$this->rubric->promptKey().'.'
             ." 'original' muss exakt (Zeichen für Zeichen) im Schülertext vorkommen und höchstens 200 Zeichen lang sein."
