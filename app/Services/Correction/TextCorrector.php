@@ -10,7 +10,7 @@ use App\Models\Scan;
 interface TextCorrector
 {
     /**
-     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check: array{fit: string, feedback: string, tips: list<string>}|null}
+     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check: array{fit: string, feedback: string, tips: list<string>}|null, rubric: array<string, array{score: int|null, reason: string}>|null}
      */
     public function correct(Scan $scan, string $text): array;
 }

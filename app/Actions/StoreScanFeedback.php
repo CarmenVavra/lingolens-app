@@ -3,8 +3,10 @@
 namespace App\Actions;
 
 use App\Enums\ErrorType;
+use App\Enums\TaskFit;
 use App\Models\Feedback;
 use App\Models\Scan;
+use App\Services\Rubric\SrdpRubric;
 use App\Support\AnnotatedText;
 use Illuminate\Support\Facades\DB;
 
@@ -14,15 +16,19 @@ use Illuminate\Support\Facades\DB;
  */
 class StoreScanFeedback
 {
+    public function __construct(private readonly SrdpRubric $rubric) {}
+
     /**
-     * @param  array{summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check?: array{fit: string, feedback: string, tips: list<string>}|null}  $result
+     * @param  array{summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check?: array{fit: string, feedback: string, tips: list<string>}|null, rubric?: array<string, array{score: int|null, reason: string}>|null}  $result
      */
     public function handle(Scan $scan, array $result): Feedback
     {
         $text = (string) $scan->raw_extracted_text;
         $offsets = AnnotatedText::locate($text, array_column($result['corrections'], 'original'));
+        $fit = isset($result['task_check']['fit']) ? TaskFit::tryFrom($result['task_check']['fit']) : null;
+        $rubric = isset($result['rubric']) ? $this->rubric->assess($result['rubric'], $scan, $fit) : null;
 
-        return DB::transaction(function () use ($scan, $result, $offsets) {
+        return DB::transaction(function () use ($scan, $result, $offsets, $rubric) {
             $feedback = $scan->feedbacks()->create([
                 'ai_summary' => $result['summary'],
                 'layout_feedback' => $result['textsorten_check'],
@@ -30,6 +36,7 @@ class StoreScanFeedback
                 'task_fit' => $result['task_check']['fit'] ?? null,
                 'task_feedback' => $result['task_check']['feedback'] ?? null,
                 'task_tips' => $result['task_check']['tips'] ?? null,
+                'rubric' => $rubric,
             ]);
 
             foreach ($result['corrections'] as $index => $correction) {

@@ -174,6 +174,47 @@
                     </section>
                 @endif
 
+                @if ($feedback?->rubric)
+                    @php($rubric = $feedback->rubric)
+                    <section class="info-panel info-panel--rubric" aria-labelledby="rubric-title">
+                        <h2 id="rubric-title" class="kicker">{{ config('srdp.name') }}</h2>
+                        @if ($rubric['total'] !== null)
+                            <p class="rubric-total">
+                                <span class="rubric-total__points">{{ $rubric['total'] }}</span>
+                                <span>von {{ $rubric['max'] }} Punkten</span>
+                            </p>
+                        @endif
+                        <dl class="rubric-list">
+                            @foreach (config('srdp.criteria') as $key => $criterion)
+                                @php($item = $rubric['criteria'][$key] ?? ['score' => null, 'reason' => ''])
+                                <div class="rubric-item">
+                                    <dt>
+                                        <span>{{ $criterion['label'] }}</span>
+                                        <span class="rubric-item__score">{{ $item['score'] ?? '–' }}<span class="rubric-item__max"> / {{ config('srdp.max_per_criterion') }}</span></span>
+                                    </dt>
+                                    @if ($item['score'] !== null)
+                                        <dd class="rubric-bar" role="img" aria-label="{{ $item['score'] }} von {{ config('srdp.max_per_criterion') }} Punkten">
+                                            <span style="width: {{ $item['score'] * 10 }}%"></span>
+                                        </dd>
+                                    @endif
+                                    @if ($item['reason'] !== '')
+                                        <dd class="rubric-item__reason">{{ $item['reason'] }}</dd>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </dl>
+                        @if ($rubric['word_penalty'])
+                            <p class="rubric-note" role="note">
+                                Dein Text hat etwa {{ $rubric['word_count'] }} Wörter, gefordert sind etwa {{ $rubric['required_words'] }}.
+                                Mehr als 10 % Abweichung: „Erfüllung der Aufgabenstellung“ wurde um eine Stufe herabgesetzt.
+                            </p>
+                        @elseif ($rubric['required_words'])
+                            <p class="rubric-meta">Wortanzahl: etwa {{ $rubric['word_count'] }} von geforderten {{ $rubric['required_words'] }} – passt.</p>
+                        @endif
+                        <p class="rubric-meta">KI-Einschätzung als Orientierung – die Note vergibt deine Lehrkraft.</p>
+                    </section>
+                @endif
+
                 @if ($feedback)
                     <section class="info-panel info-panel--tip">
                         <h2 class="kicker"><x-icon name="lightbulb" :size="18" />Matura-Tipp</h2>

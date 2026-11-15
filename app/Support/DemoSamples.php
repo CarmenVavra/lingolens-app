@@ -36,6 +36,23 @@ class DemoSamples
     }
 
     /**
+     * Demo assessment along the SRDP raster (without a task, the task criterion stays open).
+     *
+     * @return array<string, array{score: int|null, reason: string}>
+     */
+    public static function rubric(bool $withTask): array
+    {
+        return [
+            'task' => $withTask
+                ? ['score' => 6, 'reason' => 'Ziel im Wesentlichen erfüllt: zwei von drei Inhaltspunkten sind ausreichend behandelt, der Lösungsvorschlag fehlt.']
+                : ['score' => null, 'reason' => 'Ohne Aufgabenstellung nicht bewertbar.'],
+            'coherence' => ['score' => 7, 'reason' => 'Inhalte klar präsentiert, Absätze logisch; Kohäsionsmittel teils eintönig („and“, „but“).'],
+            'range' => ['score' => 6, 'reason' => 'Genügend Wortschatz für die Aufgabe, aber einige Wiederholungen und umgangssprachliche Wendungen.'],
+            'accuracy' => ['score' => 5, 'reason' => 'Grundwortschatz sitzt, aber wiederholt elementare Fehler (z.B. Subjekt-Verb-Kongruenz).'],
+        ];
+    }
+
+    /**
      * @return array{title: string, text: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>}
      */
     public static function forTextType(string $textType): array

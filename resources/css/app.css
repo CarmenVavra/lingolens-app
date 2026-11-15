@@ -658,6 +658,20 @@
     .task-tips { margin: 0; padding-left: 20px; list-style: disc; font-size: 15px; line-height: 1.5; display: flex; flex-direction: column; gap: 4px; }
     .task-prompt summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--color-navy); min-height: 44px; display: flex; align-items: center; }
     .task-prompt p { white-space: pre-line; font-size: 14px; color: var(--color-ink); background: var(--color-surface); padding: 10px 12px; }
+    .info-panel--rubric { background: #fff; border: var(--rule); }
+    .rubric-total { display: flex; align-items: baseline; gap: 8px; color: var(--color-navy); }
+    .rubric-total__points { font-size: 40px; font-weight: 800; line-height: 1; color: var(--color-raspberry); }
+    .rubric-list { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+    .rubric-item { display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: var(--rule-soft); }
+    .rubric-item dt { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 800; font-size: 15px; color: var(--color-navy); }
+    .rubric-item dd { margin: 0; }
+    .rubric-item__score { font-size: 20px; white-space: nowrap; }
+    .rubric-item__max { font-size: 13px; font-weight: 600; color: var(--color-muted); }
+    .rubric-item__reason { font-size: 14px; line-height: 1.5; color: var(--color-ink); }
+    .rubric-bar { height: 8px; background: var(--color-cream); }
+    .rubric-bar span { display: block; height: 100%; background: var(--color-navy); }
+    .rubric-note { background: #fcebb8; color: #5c3d00; padding: 10px 12px; font-size: 14px !important; }
+    .rubric-meta { font-size: 13px !important; color: var(--color-muted); }
 
     .unlocated { border: var(--rule-soft); padding: 12px 14px; font-size: 14px; display: flex; flex-direction: column; gap: 6px; }
 

@@ -15,6 +15,9 @@ class DemoTextCorrector implements TextCorrector
         $sample = DemoSamples::forTextType($scan->text_type);
         unset($sample['text']);
 
-        return $sample + ['task_check' => $scan->task_text !== null ? DemoSamples::taskCheck() : null];
+        return $sample + [
+            'task_check' => $scan->task_text !== null ? DemoSamples::taskCheck() : null,
+            'rubric' => DemoSamples::rubric($scan->task_text !== null),
+        ];
     }
 }

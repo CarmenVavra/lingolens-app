@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property TaskFit|null $task_fit
  * @property string|null $task_feedback
  * @property list<string>|null $task_tips
+ * @property array{criteria: array<string, array{score: int|null, reason: string}>, total: int|null, max: int, word_count: int, required_words: int|null, word_penalty: bool, off_topic: bool}|null $rubric
  */
 class Feedback extends Model
 {
@@ -38,6 +39,7 @@ class Feedback extends Model
         'task_fit',
         'task_feedback',
         'task_tips',
+        'rubric',
     ];
 
     /**
@@ -48,6 +50,7 @@ class Feedback extends Model
         return [
             'task_fit' => TaskFit::class,
             'task_tips' => 'array',
+            'rubric' => 'array',
         ];
     }
 

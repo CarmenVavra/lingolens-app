@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\LingoLens;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -53,8 +54,35 @@ class InstallLingoLens extends Command
             }
         }
 
+        $this->reportAiMode();
+
         $this->info('LingoLens AI ist bereit.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Shows whether the real OpenAI correction or the demo mode is active.
+     */
+    private function reportAiMode(): void
+    {
+        $configured = config('lingolens.demo_mode');
+        $explicitDemo = $configured !== null && $configured !== '' && filter_var($configured, FILTER_VALIDATE_BOOLEAN);
+
+        if (LingoLens::demoMode()) {
+            $this->warn($explicitDemo
+                ? 'KI-Modus: DEMO (LINGOLENS_DEMO_MODE=true) – Schüler:innen bekommen nur Beispiel-Korrekturen.'
+                : 'KI-Modus: DEMO – OPENAI_API_KEY fehlt in der .env, Schüler:innen bekommen nur Beispiel-Korrekturen.');
+
+            return;
+        }
+
+        if (blank(config('services.openai.key'))) {
+            $this->error('KI-Modus: OpenAI, aber OPENAI_API_KEY fehlt in der .env – jeder Scan schlägt fehl.');
+
+            return;
+        }
+
+        $this->info('KI-Modus: OpenAI (Korrektur: '.config('lingolens.openai_model').', Texterkennung: '.LingoLens::ocrLabel().').');
     }
 }

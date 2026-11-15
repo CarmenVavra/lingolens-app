@@ -5,6 +5,7 @@ namespace App\Services\Correction;
 use App\Enums\TaskFit;
 use App\Exceptions\ScanProcessingException;
 use App\Models\Scan;
+use App\Services\Rubric\SrdpRubric;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -64,7 +65,7 @@ class OpenAiTextCorrector implements TextCorrector
      * Validate and normalise the AI JSON so only well-formed data is stored.
      *
      * @param  array<mixed>  $data
-     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check: array{fit: string, feedback: string, tips: list<string>}|null}
+     * @return array{title: string, summary: string, textsorten_check: string, matura_tipp: string, corrections: list<array{original: string, corrected: string, type: string, explanation: string}>, task_check: array{fit: string, feedback: string, tips: list<string>}|null, rubric: array<string, array{score: int|null, reason: string}>|null}
      */
     public static function normalize(array $data): array
     {
@@ -97,6 +98,7 @@ class OpenAiTextCorrector implements TextCorrector
             'matura_tipp' => trim((string) ($data['matura_tipp'] ?? '')),
             'corrections' => $corrections,
             'task_check' => self::normalizeTaskCheck($data['aufgaben_check'] ?? null),
+            'rubric' => SrdpRubric::normalize($data['srdp_bewertung'] ?? null),
         ];
     }
 
