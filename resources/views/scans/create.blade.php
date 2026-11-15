@@ -9,6 +9,7 @@
             'extensions' => $extensions,
             'photoFormats' => $photoFormats,
             'maxBytes' => config('lingolens.max_upload_kb') * 1024,
+            'tokenUrl' => route('csrf-token'),
         ]))">
         <a href="{{ route('dashboard') }}" class="btn btn-ghost btn-back">
             <x-icon name="chevron-left" :size="18" />Dashboard
@@ -23,11 +24,12 @@
             @endif
         </div>
 
-        @if ($errors->any())
+        @php($fieldErrors = collect($errors->getMessages())->except('session')->flatten())
+        @if ($fieldErrors->isNotEmpty())
             <div class="alert-error" role="alert">
                 <strong>Bitte überprüfe deine Angaben:</strong>
                 <ul>
-                    @foreach ($errors->all() as $error)
+                    @foreach ($fieldErrors as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>

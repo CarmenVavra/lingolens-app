@@ -75,6 +75,9 @@
         @if (session('error'))
             <div class="alert-error" role="alert">{{ session('error') }}</div>
         @endif
+        @error('session')
+            <div class="alert-error" role="alert">{{ $message }}</div>
+        @enderror
 
         {{ $slot }}
     </main>

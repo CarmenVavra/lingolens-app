@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\CorrectionController;
+use App\Http\Controllers\CsrfTokenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\ScanController;
@@ -43,6 +44,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/scans', [ScanController::class, 'index'])->name('scans.index');
     Route::get('/scans/create', [ScanController::class, 'create'])->name('scans.create');
+    Route::get('/csrf-token', CsrfTokenController::class)->middleware('throttle:60,1')->name('csrf-token');
     Route::post('/scans', [ScanController::class, 'store'])->middleware('throttle:10,1')->name('scans.store');
     Route::get('/scans/{scan}/processing', [ScanController::class, 'processing'])->name('scans.processing');
     Route::get('/scans/{scan}/status', [ScanController::class, 'status'])->name('scans.status');

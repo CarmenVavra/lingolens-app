@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Responses\SessionExpiredResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,5 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // "Page Expired" (CSRF token mismatch): back to the form with everything that
+        // was typed instead of a dead end. Files cannot be restored by the browser.
+        // Laravel turns the TokenMismatchException into an HttpException with status 419.
+        $exceptions->render(fn (HttpException $e, Request $request) => $e->getStatusCode() === 419
+            ? SessionExpiredResponse::make($request)
+            : null);
     })->create();

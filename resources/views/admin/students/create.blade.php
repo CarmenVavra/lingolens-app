@@ -13,7 +13,7 @@
             </p>
         </div>
 
-        @if ($errors->any())
+        @if ($errors->hasAny(array_diff($errors->keys(), ['session'])))
             <div class="alert-error" role="alert">
                 <strong>Bitte überprüfe die Angaben.</strong>
             </div>

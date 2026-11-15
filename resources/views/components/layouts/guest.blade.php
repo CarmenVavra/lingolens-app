@@ -23,6 +23,9 @@
         </div>
         <main class="auth-page__form" id="main">
             <div class="auth-card">
+                @error('session')
+                    <div class="alert-error" role="alert">{{ $message }}</div>
+                @enderror
                 {{ $slot }}
                 <x-legal-links />
             </div>

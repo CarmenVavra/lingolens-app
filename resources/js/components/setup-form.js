@@ -40,6 +40,7 @@ export default (config) => ({
     extensions: config.extensions,
     photoFormats: config.photoFormats,
     maxBytes: config.maxBytes,
+    tokenUrl: config.tokenUrl,
     previewUrl: null,
     previewBroken: false,
     fileName: '',
@@ -266,13 +267,38 @@ export default (config) => ({
         this.error = '';
     },
 
-    submit(event) {
-        if (!this.hasFile || this.submitting) {
-            event.preventDefault();
+    /**
+     * Fetch the current CSRF token right before sending, so a page that stayed
+     * open for a while (or was restored by the phone) never ends in "Page Expired".
+     */
+    async submit(event) {
+        event.preventDefault();
 
+        if (!this.hasFile || this.submitting) {
             return;
         }
 
         this.submitting = true;
+        const form = event.target;
+
+        try {
+            const response = await fetch(this.tokenUrl, {
+                headers: { Accept: 'application/json' },
+                credentials: 'same-origin',
+                cache: 'no-store',
+            });
+
+            if (response.ok && !response.redirected) {
+                const { token } = await response.json();
+
+                if (token) {
+                    form.querySelector('input[name="_token"]').value = token;
+                }
+            }
+        } catch {
+            // Offline or blocked: send with the token from the page.
+        }
+
+        form.submit();
     },
 });
