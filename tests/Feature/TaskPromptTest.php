@@ -141,7 +141,7 @@ class TaskPromptTest extends TestCase
             ['tip' => 'Nenne zwei Gründe.', 'example' => ''],
         ], $scan->latestFeedback->taskTips());
 
-        Http::assertSentCount(3);
+        Http::assertSentCount(4); // OCR text, OCR task, correction, SRDP assessment
         Http::assertSent(fn (Request $request) => is_string($request['messages'][1]['content'])
             && str_contains($request['messages'][0]['content'], "<aufgabe>\n".self::TASK."\n</aufgabe>")
             && str_contains($request['messages'][0]['content'], "'aufgaben_check'"));

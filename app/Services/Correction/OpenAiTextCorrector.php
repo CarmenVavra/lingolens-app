@@ -7,9 +7,11 @@ use App\Exceptions\ScanProcessingException;
 use App\Models\Scan;
 use App\Services\Rubric\SrdpRubric;
 use Illuminate\Support\Facades\Http;
+use Throwable;
 
 /**
- * AI correction via the OpenAI Chat Completions API (JSON mode).
+ * AI correction via the OpenAI Chat Completions API (JSON mode), followed by
+ * a separate call that scores the text along the SRDP criteria.
  */
 class OpenAiTextCorrector implements TextCorrector
 {
@@ -19,21 +21,57 @@ class OpenAiTextCorrector implements TextCorrector
         private readonly string $apiKey,
         private readonly string $model,
         private readonly CorrectionPromptBuilder $prompts,
+        private readonly SrdpRubric $rubric,
     ) {}
 
     public function correct(Scan $scan, string $text): array
+    {
+        $data = $this->chat($this->prompts->build($scan), $text, 0.2);
+
+        if ($data === null) {
+            throw new ScanProcessingException('Die KI-Antwort war kein gültiges JSON.');
+        }
+
+        $result = self::normalize($data);
+        $result['rubric'] = $this->assess($scan, $text, $result['corrections']);
+
+        return $result;
+    }
+
+    /**
+     * Second call: SRDP scores with the corrections as evidence. A failure here
+     * never costs the student the correction – the scores are simply missing.
+     *
+     * @param  list<array{original: string, corrected: string, type: string, explanation: string}>  $corrections
+     * @return array<string, array{score: int|null, reason: string}>|null
+     */
+    private function assess(Scan $scan, string $text, array $corrections): ?array
+    {
+        try {
+            return SrdpRubric::normalize($this->chat($this->rubric->assessmentPrompt($scan, $text, $corrections), $text, 0.0));
+        } catch (Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+
+    /**
+     * @return array<mixed>|null The decoded JSON answer
+     */
+    private function chat(string $system, string $user, float $temperature): ?array
     {
         $payload = [
             'model' => $this->model,
             'response_format' => ['type' => 'json_object'],
             'messages' => [
-                ['role' => 'system', 'content' => $this->prompts->build($scan)],
-                ['role' => 'user', 'content' => $text],
+                ['role' => 'system', 'content' => $system],
+                ['role' => 'user', 'content' => $user],
             ],
         ];
 
         if (self::supportsTemperature($this->model)) {
-            $payload['temperature'] = 0.2;
+            $payload['temperature'] = $temperature;
         }
 
         $response = Http::withToken($this->apiKey)
@@ -44,11 +82,7 @@ class OpenAiTextCorrector implements TextCorrector
 
         $data = json_decode((string) $response->json('choices.0.message.content'), true);
 
-        if (! is_array($data)) {
-            throw new ScanProcessingException('Die KI-Antwort war kein gültiges JSON.');
-        }
-
-        return self::normalize($data);
+        return is_array($data) ? $data : null;
     }
 
     /**
@@ -98,7 +132,7 @@ class OpenAiTextCorrector implements TextCorrector
             'matura_tipp' => trim((string) ($data['matura_tipp'] ?? '')),
             'corrections' => $corrections,
             'task_check' => self::normalizeTaskCheck($data['aufgaben_check'] ?? null),
-            'rubric' => SrdpRubric::normalize($data['srdp_bewertung'] ?? null),
+            'rubric' => null,
         ];
     }
 

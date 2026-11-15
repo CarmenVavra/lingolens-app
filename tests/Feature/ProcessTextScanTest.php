@@ -72,7 +72,7 @@ class ProcessTextScanTest extends TestCase
         $this->assertSame('proplem', $scan->latestFeedback->corrections->first()->wrong_text);
         $this->assertNotNull($scan->latestFeedback->corrections->first()->start_offset);
 
-        Http::assertSentCount(2);
+        Http::assertSentCount(3); // OCR, correction, SRDP assessment
         Http::assertSent(fn (Request $request) => is_array($request['messages'][1]['content'])
             && $request['model'] === 'gpt-4o'
             && $request['temperature'] === 0

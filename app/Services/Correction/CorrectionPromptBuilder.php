@@ -5,7 +5,6 @@ namespace App\Services\Correction;
 use App\Enums\ErrorType;
 use App\Enums\SchoolType;
 use App\Models\Scan;
-use App\Services\Rubric\SrdpRubric;
 use Illuminate\Support\Facades\Config;
 
 /**
@@ -13,8 +12,6 @@ use Illuminate\Support\Facades\Config;
  */
 class CorrectionPromptBuilder
 {
-    public function __construct(private readonly SrdpRubric $rubric) {}
-
     public function build(Scan $scan): string
     {
         $prompt = "Du bist Englischlehrer an einer österreichischen Schule ({$scan->school_type->value})";
@@ -71,11 +68,10 @@ class CorrectionPromptBuilder
                     ." und 'beispiel' (ein kurzes englisches Beispiel auf B2-Niveau, 1–2 Sätze, passend zu Thema, Textsorte und"
                     .' Zielgruppe der Aufgabe, das die Schülerin bzw. der Schüler so in den Text übernehmen könnte))'
                 : '')
-            .$this->rubric->promptKey().'.'
+            .'.'
             ." 'original' muss exakt (Zeichen für Zeichen) im Schülertext vorkommen und höchstens 200 Zeichen lang sein."
             ." 'type' ist genau einer von: {$types}."
             ." 'explanation' erklärt den Fehler kurz und verständlich auf Deutsch."
-            .' Liste die Korrekturen in der Reihenfolge, in der sie im Text vorkommen.'
-            .$this->rubric->promptSection($scan);
+            .' Liste die Korrekturen in der Reihenfolge, in der sie im Text vorkommen.';
     }
 }

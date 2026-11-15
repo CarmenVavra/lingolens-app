@@ -83,20 +83,33 @@ class SrdpRubricTest extends TestCase
         $this->assertSame(10, $result['max']);
     }
 
-    public function test_the_prompt_contains_the_raster_and_asks_for_scores(): void
+    public function test_the_assessment_prompt_rests_on_evidence_and_always_uses_b2(): void
     {
-        $prompts = app(CorrectionPromptBuilder::class);
+        $rubric = app(SrdpRubric::class);
+        $text = str_repeat('word ', 100);
+        $corrections = [
+            ['original' => 'he go', 'corrected' => 'he goes', 'type' => 'Grammar', 'explanation' => ''],
+            ['original' => 'gonna', 'corrected' => 'going to', 'type' => 'Style', 'explanation' => ''],
+            ['original' => 'they was', 'corrected' => 'they were', 'type' => 'Grammar', 'explanation' => ''],
+        ];
 
-        $withTask = $prompts->build(Scan::factory()->make(['task_text' => self::TASK]));
+        $withTask = $rubric->assessmentPrompt(Scan::factory()->make(['task_text' => self::TASK, 'text_type' => 'Blog Comment']), $text, $corrections);
         $this->assertStringContainsString('IMMER auf Niveau B2', $withTask);
         $this->assertStringContainsString('auch wenn in der Aufgabenstellung oder anderswo ein anderes Niveau (z.B. B1) genannt ist', $withTask);
-        $this->assertStringContainsString("'srdp_bewertung'", $withTask);
+        $this->assertStringContainsString('Wortanzahl: etwa 100 (gefordert: etwa 250)', $withTask);
+        $this->assertStringContainsString('Gefundene Fehler: 3 (Grammar: 2, Style: 1) – das sind 3 Fehler pro 100 Wörter', $withTask);
+        $this->assertStringContainsString('„he go“ → „he goes“ (Grammar)', $withTask);
         $this->assertStringContainsString('[sprachrichtigkeit] Sprachrichtigkeit:', $withTask);
-        $this->assertStringContainsString('Berücksichtige die Wortanzahl NICHT', $withTask);
+        $this->assertStringContainsString('unterschiedliche Punkte sind der Normalfall', $withTask);
+        $this->assertStringContainsString('konkreten Blogeintrag', $withTask, 'The text type conventions are part of the assessment.');
+        $this->assertStringContainsString("zuerst 'belege'", $withTask);
         $this->assertStringContainsString('verfehlt, vergib', $withTask);
 
-        $withoutTask = $prompts->build(Scan::factory()->make(['task_text' => null]));
+        $withoutTask = $rubric->assessmentPrompt(Scan::factory()->make(['task_text' => null]), $text, []);
         $this->assertStringContainsString("'punkte' auf null", $withoutTask);
+
+        $correction = app(CorrectionPromptBuilder::class)->build(Scan::factory()->make(['task_text' => self::TASK]));
+        $this->assertStringNotContainsString('[sprachrichtigkeit]', $correction, 'Scoring runs in its own call.');
     }
 
     public function test_openai_scores_are_stored_and_shown_in_correction_mode(): void
@@ -105,18 +118,20 @@ class SrdpRubricTest extends TestCase
         Storage::fake('local');
         $text = 'I wholeheartedly agree with the decision to ban laptops in coffee shops because people need to talk.';
 
-        Http::fake(fn (Request $request) => Http::response(['choices' => [['message' => ['content' => is_array($request['messages'][1]['content'])
-            ? $text
-            : json_encode([
-                'title' => 'Laptop ban', 'summary' => 'Gut.', 'textsorten_check' => 'Ok.', 'matura_tipp' => 'Tipp.', 'corrections' => [],
+        Http::fake(fn (Request $request) => Http::response(['choices' => [['message' => ['content' => match (true) {
+            is_array($request['messages'][1]['content']) => $text,
+            str_contains($request['messages'][0]['content'], 'Prüferin') => json_encode([
+                'erfuellung' => ['belege' => ['Meinung klar'], 'begruendung' => 'Zwei von drei Inhaltspunkten.', 'punkte' => 7],
+                'kohaerenz' => ['belege' => [], 'begruendung' => 'Klar gegliedert.', 'punkte' => 7],
+                'spektrum' => ['belege' => [], 'begruendung' => 'Viele Wiederholungen.', 'punkte' => 4],
+                'sprachrichtigkeit' => ['belege' => [], 'begruendung' => 'Elementare Fehler.', 'punkte' => 5],
+            ]),
+            default => json_encode([
+                'title' => 'Laptop ban', 'summary' => 'Gut.', 'textsorten_check' => 'Ok.', 'matura_tipp' => 'Tipp.',
+                'corrections' => [['original' => 'people need', 'corrected' => 'people needs', 'type' => 'Grammar', 'explanation' => 'Test.']],
                 'aufgaben_check' => ['bewertung' => 'teilweise', 'begruendung' => 'Alternativen fehlen.', 'tipps' => []],
-                'srdp_bewertung' => [
-                    'erfuellung' => ['punkte' => 7, 'begruendung' => 'Zwei von drei Inhaltspunkten.'],
-                    'kohaerenz' => ['punkte' => 7, 'begruendung' => 'Klar gegliedert.'],
-                    'spektrum' => ['punkte' => 4, 'begruendung' => 'Viele Wiederholungen.'],
-                    'sprachrichtigkeit' => ['punkte' => 5, 'begruendung' => 'Elementare Fehler.'],
-                ],
-            ])]]]]));
+            ]),
+        }]]]]));
 
         $user = User::factory()->create();
         $scan = Scan::factory()->for($user)->create([
@@ -128,6 +143,10 @@ class SrdpRubricTest extends TestCase
         ]);
 
         ProcessTextScan::dispatchSync($scan);
+
+        Http::assertSent(fn (Request $request) => str_contains($request['messages'][0]['content'], 'Prüferin')
+            && str_contains($request['messages'][0]['content'], '„people need“ → „people needs“ (Grammar)')
+            && $request['temperature'] === 0.0);
 
         $rubric = $scan->refresh()->latestFeedback->rubric;
         $this->assertTrue($rubric['word_penalty'], 'A 17-word text is far below 250 words.');
@@ -184,6 +203,31 @@ class SrdpRubricTest extends TestCase
         $this->assertSame('B2', $good['level']);
 
         $this->assertSame(5, $rubric->assess($this->criteria(8, 8, 8, 8), $scan, TaskFit::OffTopic)['grade'], 'A missed task is always negative.');
+    }
+
+    public function test_a_failing_assessment_call_keeps_the_correction(): void
+    {
+        config(['services.openai.key' => 'test-openai-key']);
+        Storage::fake('local');
+
+        Http::fake(fn (Request $request) => match (true) {
+            is_array($request['messages'][1]['content']) => Http::response(['choices' => [['message' => ['content' => 'My summer holidays were very nice and relaxing.']]]]),
+            str_contains($request['messages'][0]['content'], 'Prüferin') => Http::response('Server error', 500),
+            default => Http::response(['choices' => [['message' => ['content' => json_encode([
+                'title' => 'Holidays', 'summary' => 'Gut.', 'textsorten_check' => 'Ok.', 'matura_tipp' => 'Tipp.', 'corrections' => [],
+            ])]]]]),
+        });
+
+        $scan = Scan::factory()->create([
+            'uses_sample' => false,
+            'file_path' => UploadedFile::fake()->image('text.jpg')->store('scans/1', 'local'),
+        ]);
+
+        ProcessTextScan::dispatchSync($scan);
+
+        $scan->refresh();
+        $this->assertTrue($scan->isCompleted());
+        $this->assertNull($scan->latestFeedback->rubric);
     }
 
     public function test_the_install_command_reports_the_ai_mode(): void

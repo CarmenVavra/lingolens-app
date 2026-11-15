@@ -10,6 +10,7 @@ use App\Services\Correction\TextCorrector;
 use App\Services\Ocr\GoogleVisionTextRecognizer;
 use App\Services\Ocr\OpenAiTextRecognizer;
 use App\Services\Ocr\TextRecognizer;
+use App\Services\Rubric\SrdpRubric;
 use App\Support\LingoLens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -43,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
                 (string) config('services.openai.key'),
                 (string) config('lingolens.openai_model'),
                 $app->make(CorrectionPromptBuilder::class),
+                $app->make(SrdpRubric::class),
             ));
     }
 
