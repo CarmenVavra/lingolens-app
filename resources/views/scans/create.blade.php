@@ -238,6 +238,16 @@
                 </fieldset>
             </div>
 
+            {{-- Errors from sending via fetch (validation, connection, session) --}}
+            <div class="alert-error" role="alert" x-ref="serverErrors" x-show="serverErrors.length" x-cloak>
+                <strong>Das hat nicht geklappt:</strong>
+                <ul>
+                    <template x-for="message in serverErrors" :key="message">
+                        <li x-text="message"></li>
+                    </template>
+                </ul>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-block" :disabled="!hasFile || submitting" disabled>
                 <span class="btn-label" x-text="submitting ? 'Wird hochgeladen …' : 'Text analysieren'">Text analysieren</span>
                 <x-icon name="arrow-right" />

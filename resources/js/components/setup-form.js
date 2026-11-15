@@ -23,6 +23,21 @@ function kindOf(extension) {
     return Object.keys(KINDS).find((kind) => KINDS[kind].includes(extension)) ?? null;
 }
 
+/**
+ * Copy a picked file into memory. iOS Safari deletes the temporary camera file
+ * as soon as the camera input changes again; the form would then be sent with
+ * an empty body ("Page Expired"). An in-memory copy stays readable.
+ */
+async function keepInMemory(file) {
+    try {
+        const buffer = await file.arrayBuffer();
+
+        return new File([buffer], file.name, { type: file.type || 'application/octet-stream', lastModified: file.lastModified });
+    } catch {
+        return null;
+    }
+}
+
 function formatSize(bytes) {
     if (bytes < 1024 * 1024) {
         return Math.max(1, Math.round(bytes / 1024)) + ' KB';
@@ -52,6 +67,9 @@ export default (config) => ({
     submitting: false,
     taskName: '',
     taskError: '',
+    textFile: null,
+    taskFile: null,
+    serverErrors: [],
 
     get types() {
         return this.textTypes[this.school] ?? [];
@@ -119,8 +137,6 @@ export default (config) => ({
         if (file) {
             this.handOver(file);
         }
-
-        event.target.value = '';
     },
 
     onDrop(event) {
@@ -147,7 +163,7 @@ export default (config) => ({
         this.accept(file);
     },
 
-    accept(file) {
+    async accept(file) {
         const extension = extensionOf(file.name);
         const kind = kindOf(extension);
 
@@ -167,12 +183,14 @@ export default (config) => ({
             return;
         }
 
+        // Copy first: the button only becomes active once the file is safe in memory.
+        this.textFile = await keepInMemory(file);
         this.kind = kind;
         this.fileName = file.name;
         this.fileSize = file.size;
 
         if (kind === 'photo') {
-            this.previewUrl = URL.createObjectURL(file);
+            this.previewUrl = URL.createObjectURL(this.textFile ?? file);
         }
     },
 
@@ -187,7 +205,6 @@ export default (config) => ({
 
     onTaskCamera(event) {
         const file = event.target.files && event.target.files[0];
-        event.target.value = '';
 
         if (!file) {
             return;
@@ -206,7 +223,7 @@ export default (config) => ({
         this.acceptTask(file);
     },
 
-    acceptTask(file) {
+    async acceptTask(file) {
         const extension = extensionOf(file.name);
         this.taskError = '';
 
@@ -225,10 +242,12 @@ export default (config) => ({
         }
 
         this.taskName = file.name + ' · ' + formatSize(file.size);
+        this.taskFile = await keepInMemory(file);
     },
 
     clearTask(resetError = true) {
         this.taskName = '';
+        this.taskFile = null;
 
         if (resetError) {
             this.taskError = '';
@@ -265,11 +284,13 @@ export default (config) => ({
         this.kind = null;
         this.useSample = false;
         this.error = '';
+        this.textFile = null;
     },
 
     /**
-     * Fetch the current CSRF token right before sending, so a page that stayed
-     * open for a while (or was restored by the phone) never ends in "Page Expired".
+     * Send the form with fetch(): fresh CSRF token, the photos from memory
+     * (see keepInMemory) and errors shown right in the form. Without fetch the
+     * browser submits the form the classic way.
      */
     async submit(event) {
         event.preventDefault();
@@ -279,8 +300,75 @@ export default (config) => ({
         }
 
         this.submitting = true;
+        this.serverErrors = [];
         const form = event.target;
+        const token = (await this.freshToken()) ?? form.querySelector('input[name="_token"]').value;
 
+        if (!window.fetch || !window.FormData) {
+            form.querySelector('input[name="_token"]').value = token;
+            form.submit();
+
+            return;
+        }
+
+        const data = new FormData(form);
+        data.set('_token', token);
+        data.delete('file');
+        data.delete('task_file');
+
+        if (!this.useSample) {
+            if (!this.textFile) {
+                this.fail(['Dein Foto bzw. deine Datei konnte nicht gelesen werden. Bitte wähle sie noch einmal aus.']);
+
+                return;
+            }
+
+            data.append('file', this.textFile, this.textFile.name);
+        }
+
+        if (this.taskFile) {
+            data.append('task_file', this.taskFile, this.taskFile.name);
+        }
+
+        let response;
+
+        try {
+            response = await fetch(form.action, {
+                method: 'POST',
+                body: data,
+                credentials: 'same-origin',
+                headers: { Accept: 'application/json', 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
+            });
+        } catch {
+            this.fail(['Der Text konnte nicht gesendet werden. Bitte prüfe deine Internetverbindung und versuche es noch einmal.']);
+
+            return;
+        }
+
+        // Success: Laravel redirects to the processing screen, fetch followed it.
+        if (response.ok) {
+            window.location.assign(response.url);
+
+            return;
+        }
+
+        const body = await response.json().catch(() => ({}));
+
+        if (response.status === 422) {
+            this.fail(Object.values(body.errors ?? {}).flat());
+        } else if (response.status === 419) {
+            this.fail(['Deine Sitzung ist abgelaufen. Bitte lade die Seite neu und melde dich gegebenenfalls wieder an.']);
+        } else if (response.status === 429) {
+            this.fail(['Zu viele Versuche in kurzer Zeit. Bitte warte eine Minute und versuche es dann noch einmal.']);
+        } else if (response.status === 401) {
+            window.location.assign('/login');
+        } else {
+            this.fail(['Beim Hochladen ist ein Fehler aufgetreten (' + response.status + '). Bitte versuche es noch einmal.']);
+        }
+    },
+
+    /** Current CSRF token of the session (null when offline or logged out). */
+    async freshToken() {
         try {
             const response = await fetch(this.tokenUrl, {
                 headers: { Accept: 'application/json' },
@@ -291,14 +379,18 @@ export default (config) => ({
             if (response.ok && !response.redirected) {
                 const { token } = await response.json();
 
-                if (token) {
-                    form.querySelector('input[name="_token"]').value = token;
-                }
+                return token || null;
             }
         } catch {
-            // Offline or blocked: send with the token from the page.
+            // Offline or blocked.
         }
 
-        form.submit();
+        return null;
+    },
+
+    fail(messages) {
+        this.serverErrors = messages.length ? messages : ['Bitte überprüfe deine Angaben.'];
+        this.submitting = false;
+        this.$nextTick(() => this.$refs.serverErrors?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
     },
 });
